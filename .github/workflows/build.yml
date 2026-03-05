@@ -1,4 +1,4 @@
-name: Build & Test Workflow
+name: My Build & Test Workflow
 
 on: [pull_request]
 
