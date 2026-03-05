@@ -28,13 +28,13 @@ jobs:
         - name: Setup .NET
           uses: actions/setup-dotnet@v4
           with:
-            dotnet-version: 9.0
+            dotnet-version: '9.0.x'
 
         - name: Restore workloads
-          run: dotnet workload restore ./Notes/Notes.csproj
+          run: dotnet workload restore ./StarterApp/StarterApp.csproj
 
         - name: Restore dependencies
-          run: dotnet restore ./Notes/Notes.csproj
+          run: dotnet restore ./StarterApp.sln
 
         - name: Install Tools
           run: dotnet tool install --global dotnet-coverage
@@ -75,17 +75,17 @@ jobs:
           env:
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           run: |
-            ./.sonar/scanner/dotnet-sonarscanner begin /k:"PipelineTest123_notes" /o:"pipelinetest123" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.scanAll=false /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-
+            ./.sonar/scanner/dotnet-sonarscanner begin /k:"ml40683364_rental-marketplace-ptp" /o:"ml40683364" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.scanner.scanAll=false /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+            
         - name: Build project
           env:
             ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
-          run: dotnet build ./Notes/Notes.csproj --framework net9.0
+          run: dotnet build ./StarterApp.sln --framework net9.0
 
         - name: Test
           env:
             ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
-          run: dotnet-coverage collect "dotnet test ./notes.sln --framework net9.0" -f xml -o "coverage.xml"
+          run: dotnet-coverage collect "dotnet test ./StarterApp.sln --framework net9.0" -f xml -o "coverage.xml"
 
         - name: End Sonar Analysis
           env:
