@@ -6,32 +6,32 @@
              Shell.BackButtonBehavior="{x:Null}">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Home" 
+        <ToolbarItem Text="Home"
                      Command="{Binding NavigateToDashboardCommand}"
-                     IconImageSource="home.png" />
+                     IconImageSource="home.png"/>
     </ContentPage.ToolbarItems>
 
     <ScrollView>
         <Grid Padding="20">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- Loading Indicator -->
-            <ActivityIndicator Grid.Row="0" 
-                             IsRunning="{Binding IsLoading}"
-                             IsVisible="{Binding IsLoading}"
-                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center"
-                             Margin="0,0,0,20" />
+            <ActivityIndicator Grid.Row="0"
+                               IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,0,0,20"/>
 
             <!-- Main Content -->
-            <StackLayout Grid.Row="1" 
-                        IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
-                        Spacing="15">
+            <StackLayout Grid.Row="1"
+                         IsVisible="{Binding IsLoading, Converter={StaticResource InvertedBoolConverter}}"
+                         Spacing="15">
 
                 <!-- Messages -->
                 <Frame BackgroundColor="{StaticResource Danger}"
@@ -41,7 +41,7 @@
                        HasShadow="False">
                     <Label Text="{Binding ErrorMessage}"
                            TextColor="White"
-                           FontSize="14" />
+                           FontSize="14"/>
                 </Frame>
 
                 <Frame BackgroundColor="{StaticResource Success}"
@@ -51,7 +51,7 @@
                        HasShadow="False">
                     <Label Text="{Binding SuccessMessage}"
                            TextColor="White"
-                           FontSize="14" />
+                           FontSize="14"/>
                 </Frame>
 
                 <!-- User Information Section -->
@@ -63,80 +63,81 @@
                         <Label Text="User Information"
                                FontSize="18"
                                FontAttributes="Bold"
-                               Margin="0,0,0,10" />
+                               Margin="0,0,0,10"/>
 
                         <!-- First Name -->
                         <StackLayout>
-                            <Label Text="First Name" 
+                            <Label Text="First Name"
                                    FontSize="14"
                                    FontAttributes="Bold"
-                                   Margin="0,0,0,5" />
+                                   Margin="0,0,0,5"/>
                             <Entry Text="{Binding FirstName}"
                                    Placeholder="Enter first name"
                                    FontSize="16"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}" />
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"/>
                         </StackLayout>
 
                         <!-- Last Name -->
                         <StackLayout>
-                            <Label Text="Last Name" 
+                            <Label Text="Last Name"
                                    FontSize="14"
                                    FontAttributes="Bold"
-                                   Margin="0,0,0,5" />
+                                   Margin="0,0,0,5"/>
                             <Entry Text="{Binding LastName}"
                                    Placeholder="Enter last name"
                                    FontSize="16"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}" />
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"/>
                         </StackLayout>
 
                         <!-- Email -->
                         <StackLayout>
-                            <Label Text="Email" 
+                            <Label Text="Email"
                                    FontSize="14"
                                    FontAttributes="Bold"
-                                   Margin="0,0,0,5" />
+                                   Margin="0,0,0,5"/>
                             <Entry Text="{Binding Email}"
                                    Placeholder="Enter email address"
                                    Keyboard="Email"
                                    FontSize="16"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}" />
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"/>
                         </StackLayout>
 
                         <!-- Password Fields (only for new users) -->
                         <StackLayout IsVisible="{Binding ShowPasswordFields}">
                             <StackLayout>
-                                <Label Text="Password" 
+                                <Label Text="Password"
                                        FontSize="14"
                                        FontAttributes="Bold"
-                                       Margin="0,0,0,5" />
+                                       Margin="0,0,0,5"/>
                                 <Entry Text="{Binding Password}"
                                        Placeholder="Enter password"
                                        IsPassword="True"
                                        FontSize="16"
-                                       BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}" />
+                                       BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"/>
                             </StackLayout>
 
                             <StackLayout>
-                                <Label Text="Confirm Password" 
+                                <Label Text="Confirm Password"
                                        FontSize="14"
                                        FontAttributes="Bold"
-                                       Margin="0,0,0,5" />
+                                       Margin="0,0,0,5"/>
                                 <Entry Text="{Binding ConfirmPassword}"
                                        Placeholder="Confirm password"
                                        IsPassword="True"
                                        FontSize="16"
-                                       BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}" />
+                                       BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"/>
                             </StackLayout>
                         </StackLayout>
 
                         <!-- Active Status -->
-                        <StackLayout Orientation="Horizontal" Spacing="10">
+                        <StackLayout Orientation="Horizontal"
+                                Spacing="10">
                             <Switch IsToggled="{Binding IsActive}"
                                     OnColor="{StaticResource Success}"
-                                    ThumbColor="White" />
+                                    ThumbColor="White"/>
                             <Label Text="User Active"
                                    FontSize="16"
-                                   VerticalOptions="Center" />
+                                   VerticalOptions="Center"/>
                         </StackLayout>
                     </StackLayout>
                 </Frame>
@@ -151,50 +152,50 @@
                         <Label Text="User Roles"
                                FontSize="18"
                                FontAttributes="Bold"
-                               Margin="0,0,0,10" />
+                               Margin="0,0,0,10"/>
 
                         <CollectionView ItemsSource="{Binding AvailableRoles}"
-                                      BackgroundColor="Transparent">
+                                        BackgroundColor="Transparent">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Padding="0,8">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
 
-                                        <StackLayout Grid.Column="0" 
-                                                   VerticalOptions="Center">
+                                        <StackLayout Grid.Column="0"
+                                                     VerticalOptions="Center">
                                             <Label Text="{Binding Name}"
                                                    FontSize="16"
-                                                   FontAttributes="Bold" />
+                                                   FontAttributes="Bold"/>
                                             <Label Text="{Binding Description}"
                                                    FontSize="14"
                                                    TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
-                                                   IsVisible="{Binding Description, Converter={StaticResource StringToBoolConverter}}" />
+                                                   IsVisible="{Binding Description, Converter={StaticResource StringToBoolConverter}}"/>
                                         </StackLayout>
 
                                         <Button Grid.Column="1"
-                                              Text="{Binding ButtonText}"
-                                              BackgroundColor="{Binding ButtonColor}"
-                                              TextColor="White"
-                                              FontSize="14"
-                                              CornerRadius="6"
-                                              Padding="15,8"
-                                              Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddRoleCommand}"
-                                              CommandParameter="{Binding}"
-                                              IsVisible="{Binding IsAssigned, Converter={StaticResource InvertedBoolConverter}}" />
+                                                Text="{Binding ButtonText}"
+                                                BackgroundColor="{Binding ButtonColor}"
+                                                TextColor="White"
+                                                FontSize="14"
+                                                CornerRadius="6"
+                                                Padding="15,8"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AddRoleCommand}"
+                                                CommandParameter="{Binding}"
+                                                IsVisible="{Binding IsAssigned, Converter={StaticResource InvertedBoolConverter}}"/>
 
                                         <Button Grid.Column="1"
-                                              Text="{Binding ButtonText}"
-                                              BackgroundColor="{Binding ButtonColor}"
-                                              TextColor="White"
-                                              FontSize="14"
-                                              CornerRadius="6"
-                                              Padding="15,8"
-                                              Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveRoleCommand}"
-                                              CommandParameter="{Binding}"
-                                              IsVisible="{Binding IsAssigned}" />
+                                                Text="{Binding ButtonText}"
+                                                BackgroundColor="{Binding ButtonColor}"
+                                                TextColor="White"
+                                                FontSize="14"
+                                                CornerRadius="6"
+                                                Padding="15,8"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RemoveRoleCommand}"
+                                                CommandParameter="{Binding}"
+                                                IsVisible="{Binding IsAssigned}"/>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -204,11 +205,11 @@
             </StackLayout>
 
             <!-- Action Buttons -->
-            <StackLayout Grid.Row="2" 
-                        Orientation="Horizontal" 
-                        HorizontalOptions="FillAndExpand"
-                        Spacing="15"
-                        Margin="0,20,0,0">
+            <StackLayout Grid.Row="2"
+                         Orientation="Horizontal"
+                         HorizontalOptions="FillAndExpand"
+                         Spacing="15"
+                         Margin="0,20,0,0">
 
                 <Button Text="Back"
                         BackgroundColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray700}}"
@@ -217,7 +218,7 @@
                         FontSize="16"
                         CornerRadius="8"
                         HeightRequest="50"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="FillAndExpand"/>
 
                 <Button Text="Save"
                         BackgroundColor="{StaticResource Primary}"
@@ -227,7 +228,7 @@
                         FontAttributes="Bold"
                         CornerRadius="8"
                         HeightRequest="50"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="FillAndExpand"/>
 
                 <Button Text="Delete"
                         BackgroundColor="{StaticResource Danger}"
@@ -237,7 +238,7 @@
                         CornerRadius="8"
                         HeightRequest="50"
                         HorizontalOptions="FillAndExpand"
-                        IsVisible="{Binding CanDeleteCurrentUser}" />
+                        IsVisible="{Binding CanDeleteCurrentUser}"/>
             </StackLayout>
         </Grid>
     </ScrollView>

@@ -22,6 +22,55 @@ namespace StarterApp.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            // modelBuilder.Entity("StarterApp.Database.Models.Item", b =>
+            //     {
+            //         b.Property<int>("Id")
+            //             .ValueGeneratedOnAdd()
+            //             .HasColumnType("integer");
+
+            //         NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+            //         b.Property<string>("Category")
+            //             .IsRequired()
+            //             .HasMaxLength(100)
+            //             .HasColumnType("character varying(100)");
+
+            //         b.Property<DateTime?>("CreatedAt")
+            //             .HasColumnType("timestamp with time zone");
+
+            //         b.Property<decimal>("DailyRate")
+            //             .HasPrecision(10, 2)
+            //             .HasColumnType("numeric(10,2)");
+
+            //         b.Property<string>("Description")
+            //             .IsRequired()
+            //             .HasColumnType("text");
+
+            //         b.Property<bool>("IsAvailable")
+            //             .HasColumnType("boolean");
+
+            //         b.Property<string>("Location")
+            //             .IsRequired()
+            //             .HasColumnType("text");
+
+            //         b.Property<int>("OwnerId")
+            //             .HasColumnType("integer");
+
+            //         b.Property<string>("Title")
+            //             .IsRequired()
+            //             .HasMaxLength(200)
+            //             .HasColumnType("character varying(200)");
+
+            //         b.Property<DateTime?>("UpdatedAt")
+            //             .HasColumnType("timestamp with time zone");
+
+            //         b.HasKey("Id");
+
+            //         b.HasIndex("OwnerId");
+
+            //         b.ToTable("items");
+            //     });
+
             modelBuilder.Entity("StarterApp.Database.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -139,6 +188,17 @@ namespace StarterApp.Database.Migrations
 
                     b.ToTable("user_role");
                 });
+
+            // modelBuilder.Entity("StarterApp.Database.Models.Item", b =>
+            //     {
+            //         b.HasOne("StarterApp.Database.Models.User", "Owner")
+            //             .WithMany()
+            //             .HasForeignKey("OwnerId")
+            //             .OnDelete(DeleteBehavior.Cascade)
+            //             .IsRequired();
+
+            //         b.Navigation("Owner");
+            //     });
 
             modelBuilder.Entity("StarterApp.Database.Models.UserRole", b =>
                 {

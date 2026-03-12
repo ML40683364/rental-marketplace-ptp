@@ -37,6 +37,7 @@ public class AppDbContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Item> Items { get; set; } // This tells EF Core "there is an items table in the database" — it's how to query items like context.Items.ToList()
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,6 +75,17 @@ public class AppDbContext : DbContext
                   .WithMany(r => r.UserRoles)
                   .HasForeignKey(ur => ur.RoleId);
         });
+        // This configures how the columns are created in PostgreSQL — for example Title can't be longer than 200 characters, 
+        // and DailyRate stores money with 2 decimal places like 9.99.
+        // Without line 1 — EF Core doesn't know the table exists.
+        // Without line 2 — the columns get created with no size limits or precision, which is bad for a database.
+        // modelBuilder.Entity<Item>(entity =>
+        // {
+        //     entity.Property(e => e.Title).HasMaxLength(200);
+        //     entity.Property(e => e.Category).HasMaxLength(100);
+        //     entity.Property(e => e.DailyRate).HasPrecision(10, 2);
+        // });
+        // 
     }
 
 }

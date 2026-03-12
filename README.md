@@ -94,9 +94,47 @@ For a comprehensive guide on using this app and understanding its architecture, 
 
 ### notes
 
-### Start the emulator 
+### Start the emulator (1-terminal)
 emulator -avd Pixel_9_Pro
  
 
-### start the bridge  
+### start the bridge  (2-terminal)
 adb -a -P 5037 nodaemon server start 
+
+
+### Must be in the workspace in the container 
+root ➜ /workspace/StarterApp (feature/workflow) $ cd ..
+root ➜ /workspace/StarterApp (feature/workflow) $ adb devices
+root ➜ /workspace (feature/workflow) $ dotnet build -c Debug
+root ➜ /workspace (feature/workflow) $ adb install -r StarterApp/bin/Debug/net10.0-android/android-x64/com.companyname.starterapp-Signed.apk
+
+
+
+
+### Fixed workflow 
+
+### Start the emulator
+
+emulator -avd Pixel_9_Pro
+
+### Start ADB:
+
+adb -a -P 5037 nodaemon server start
+
+### Check device:
+
+adb devices
+
+### Clean the build (important for XAML changes):
+
+dotnet clean -c Debug
+
+### Rebuild the app:
+
+dotnet build -c Debug
+
+### Install to emulator (overwrite existing):
+
+adb install -r StarterApp/bin/Debug/net10.0-android/android-x64/com.companyname.starterapp-Signed.apk
+
+### Run the app on the emulator.
