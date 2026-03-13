@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.NearbyItemsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:StarterApp.ViewModels"
+             Title="{Binding Title}">
+
+    <StackLayout Padding="15" Spacing="15">
+
+        <!-- Error -->
+        <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
+                Padding="15" IsVisible="{Binding HasError}">
+            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+            <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+        </Border>
+
+        <!-- Location Info -->
+        <Label Text="{Binding CurrentLocationText}" FontSize="13"
+               TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"
+               HorizontalOptions="Center"/>
+
+        <!-- Radius Slider -->
+        <StackLayout Orientation="Horizontal" Spacing="10">
+            <Label Text="Radius:" VerticalOptions="Center" FontSize="14"/>
+            <Slider Minimum="1" Maximum="50" Value="{Binding RadiusKm}"
+                    HorizontalOptions="FillAndExpand"/>
+            <Label Text="{Binding RadiusKm, StringFormat='{0:F0}km'}"
+                   VerticalOptions="Center" FontSize="14" WidthRequest="40"/>
+        </StackLayout>
+
+        <!-- Search Button -->
+        <Button Text="Search Nearby"
+                Command="{Binding SearchNearbyCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                TextColor="White" HeightRequest="50" CornerRadius="8" FontAttributes="Bold"/>
+
+        <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
+                           Color="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+
+        <!-- Results -->
+        <CollectionView ItemsSource="{Binding NearbyItems}" EmptyView="No items found nearby.">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="0,5" Padding="15"
+                            BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                            Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NearbyItemsViewModel}}, Path=SelectItemCommand}"
+                                                  CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding Location}" FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                            </StackLayout>
+                            <Label Grid.Column="1"
+                                   Text="{Binding DailyRate, StringFormat='£{0:F2}/day'}"
+                                   FontAttributes="Bold" VerticalOptions="Center"
+                                   TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </StackLayout>
+</ContentPage>

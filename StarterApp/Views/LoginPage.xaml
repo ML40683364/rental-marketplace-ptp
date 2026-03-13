@@ -7,20 +7,22 @@
              Shell.NavBarIsVisible="False">
 
     <ContentPage.BindingContext>
-        <vm:LoginViewModel />
+        <vm:LoginViewModel/>
     </ContentPage.BindingContext>
 
     <ScrollView>
-        <Grid Padding="30" RowSpacing="20" VerticalOptions="Center">
+        <Grid Padding="30"
+                RowSpacing="20"
+                VerticalOptions="Center">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- App Logo/Title -->
@@ -30,7 +32,7 @@
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
                    Margin="0,0,0,30"
-                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                   TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
 
             <!-- Error Message -->
             <Border Grid.Row="1"
@@ -40,11 +42,11 @@
                     Padding="15"
                     IsVisible="{Binding HasError}">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="8" />
+                    <RoundRectangle CornerRadius="8"/>
                 </Border.StrokeShape>
                 <Label Text="{Binding ErrorMessage}"
                        TextColor="{AppThemeBinding Light=#D32F2F, Dark=#EF5350}"
-                       FontSize="14" />
+                       FontSize="14"/>
             </Border>
 
             <!-- Email Entry -->
@@ -53,14 +55,14 @@
                     StrokeThickness="1"
                     BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="8" />
+                    <RoundRectangle CornerRadius="8"/>
                 </Border.StrokeShape>
                 <Entry x:Name="EmailEntry"
                        Text="{Binding Email}"
                        Placeholder="Email"
                        Keyboard="Email"
                        ReturnType="Next"
-                       Margin="15,10" />
+                       Margin="15,10"/>
             </Border>
 
             <!-- Password Entry -->
@@ -69,20 +71,23 @@
                     StrokeThickness="1"
                     BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
                 <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="8" />
+                    <RoundRectangle CornerRadius="8"/>
                 </Border.StrokeShape>
                 <Entry x:Name="PasswordEntry"
                        Text="{Binding Password}"
                        Placeholder="Password"
                        IsPassword="True"
                        ReturnType="Done"
-                       Margin="15,10" />
+                       Margin="15,10"/>
             </Border>
 
             <!-- Remember Me -->
-            <StackLayout Grid.Row="4" Orientation="Horizontal" HorizontalOptions="Start">
-                <CheckBox IsChecked="{Binding RememberMe}" />
-                <Label Text="Remember me" VerticalOptions="Center" />
+            <StackLayout Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalOptions="Start">
+                <CheckBox IsChecked="{Binding RememberMe}"/>
+                <Label Text="Remember me"
+                        VerticalOptions="Center"/>
             </StackLayout>
 
             <!-- Login Button -->
@@ -94,16 +99,18 @@
                     HeightRequest="50"
                     CornerRadius="8"
                     FontSize="16"
-                    FontAttributes="Bold" />
+                    FontAttributes="Bold"/>
 
             <!-- Loading Indicator -->
             <ActivityIndicator Grid.Row="6"
-                              IsVisible="{Binding IsBusy}"
-                              IsRunning="{Binding IsBusy}"
-                              Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
+                               IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
 
             <!-- Footer Links -->
-            <StackLayout Grid.Row="7" Spacing="10" Margin="0,20,0,0">
+            <StackLayout Grid.Row="7"
+                    Spacing="10"
+                    Margin="0,20,0,0">
                 <Button Text="Create Account"
                         Command="{Binding NavigateToRegisterCommand}"
                         BackgroundColor="Transparent"
@@ -111,13 +118,13 @@
                         BorderWidth="1"
                         BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                         HeightRequest="45"
-                        CornerRadius="8" />
-                
+                        CornerRadius="8"/>
+
                 <Button Text="Forgot Password?"
                         Command="{Binding ForgotPasswordCommand}"
                         BackgroundColor="Transparent"
                         TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"
-                        FontSize="14" />
+                        FontSize="14"/>
             </StackLayout>
         </Grid>
     </ScrollView>

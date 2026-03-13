@@ -138,3 +138,7 @@ dotnet build -c Debug
 adb install -r StarterApp/bin/Debug/net10.0-android/android-x64/com.companyname.starterapp-Signed.apk
 
 ### Run the app on the emulator.
+
+
+### dotnet build is enough for day-to-day work
+dotnet build

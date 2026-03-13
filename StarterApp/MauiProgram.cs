@@ -20,10 +20,53 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        builder.Services.AddDbContext<AppDbContext>();
+        // -------------------------------------------------------------------
+        // Set useSharedApi to true to connect to the shared REST API,
+        // or false to use the local PostgreSQL database.
+        // This is an example of dependency injection — the ViewModels do
+        // not change regardless of which implementation is registered here.
+        // -------------------------------------------------------------------
+        const bool useSharedApi = false;
 
-        builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
+        if (useSharedApi)
+        {
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri("https://set09102-api.b-davison.workers.dev/")
+            };
+            builder.Services.AddSingleton(httpClient);
+            builder.Services.AddSingleton<IAuthenticationService, ApiAuthenticationService>();
+        }
+        else
+        {
+            builder.Services.AddDbContext<AppDbContext>();
+            builder.Services.AddSingleton<IAuthenticationService, LocalAuthenticationService>();
+        }
+
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+
+        // Repositories
+        builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IItemRepository, StarterApp.Database.Data.Repositories.ItemRepository>();
+        builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IRentalRepository, StarterApp.Database.Data.Repositories.RentalRepository>();
+        builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IReviewRepository, StarterApp.Database.Data.Repositories.ReviewRepository>();
+
+        // Services
+        builder.Services.AddTransient<IRentalService, RentalService>();
+        builder.Services.AddSingleton<ILocationService, LocationService>();
+
+        // Rental marketplace pages
+        builder.Services.AddTransient<ItemsListViewModel>();
+        builder.Services.AddTransient<ItemsListPage>();
+        builder.Services.AddTransient<ItemDetailViewModel>();
+        builder.Services.AddTransient<ItemDetailPage>();
+        builder.Services.AddTransient<CreateItemViewModel>();
+        builder.Services.AddTransient<CreateItemPage>();
+        builder.Services.AddTransient<NearbyItemsViewModel>();
+        builder.Services.AddTransient<NearbyItemsPage>();
+        builder.Services.AddTransient<RentalsViewModel>();
+        builder.Services.AddTransient<RentalsPage>();
+        builder.Services.AddTransient<ReviewsViewModel>();
+        builder.Services.AddTransient<ReviewsPage>();
 
         builder.Services.AddSingleton<AppShellViewModel>();
         builder.Services.AddSingleton<AppShell>();

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.ItemsListPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:StarterApp.ViewModels"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="+ List Item"
+                     Command="{Binding CreateItemCommand}" />
+    </ContentPage.ToolbarItems>
+
+    <RefreshView IsRefreshing="{Binding IsBusy}"
+                 Command="{Binding LoadItemsCommand}">
+        <StackLayout Padding="15" Spacing="10">
+
+            <!-- Error -->
+            <Border BackgroundColor="#FFEBEE"
+                    Stroke="#F44336"
+                    StrokeThickness="1"
+                    Padding="15"
+                    IsVisible="{Binding HasError}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+            </Border>
+
+            <!-- Items List -->
+            <CollectionView ItemsSource="{Binding Items}"
+                            EmptyView="No items available. Pull to refresh.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5"
+                                Padding="15"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ItemsListViewModel}}, Path=SelectItemCommand}"
+                                                      CommandParameter="{Binding .}"/>
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding Title}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"/>
+                                    <Label Text="{Binding Location}"
+                                           FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                                    <Label Text="{Binding Description}"
+                                           FontSize="12"
+                                           TextColor="{AppThemeBinding Light=#888, Dark=#999}"
+                                           MaxLines="2"
+                                           LineBreakMode="TailTruncation"/>
+                                </StackLayout>
+                                <StackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="End">
+                                    <Label Text="{Binding DailyRate, StringFormat='£{0:F2}'}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                                    <Label Text="/day"
+                                           FontSize="11"
+                                           TextColor="{AppThemeBinding Light=#888, Dark=#999}"
+                                           HorizontalOptions="Center"/>
+                                </StackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </StackLayout>
+    </RefreshView>
+</ContentPage>

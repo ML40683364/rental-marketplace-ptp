@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.ItemDetailPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <StackLayout Padding="15" Spacing="15">
+
+            <!-- Error -->
+            <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
+                    Padding="15" IsVisible="{Binding HasError}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+            </Border>
+
+            <!-- Item Info -->
+            <Border Padding="20"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                <StackLayout Spacing="8">
+                    <Label Text="{Binding Item.Title}" FontSize="22" FontAttributes="Bold"/>
+                    <Label Text="{Binding Item.Location}" FontSize="14"
+                           TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                    <Label Text="{Binding Item.DailyRate, StringFormat='£{0:F2} per day'}"
+                           FontSize="18" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                    <Label Text="{Binding Item.Description}" FontSize="14" Margin="0,8,0,0"/>
+                    <Label Text="{Binding AverageRating, StringFormat='⭐ {0:F1} / 5'}"
+                           FontSize="14" Margin="0,4,0,0"/>
+                </StackLayout>
+            </Border>
+
+            <!-- Request Rental -->
+            <Border Padding="20"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                <StackLayout Spacing="12">
+                    <Label Text="Request Rental" FontSize="18" FontAttributes="Bold"/>
+                    <Label Text="Start Date" FontSize="13" TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                    <DatePicker Date="{Binding StartDate}" MinimumDate="{x:Static sys:DateTime.Today}"
+                                xmlns:sys="clr-namespace:System;assembly=mscorlib"/>
+                    <Label Text="End Date" FontSize="13" TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                    <DatePicker Date="{Binding EndDate}" MinimumDate="{x:Static sys:DateTime.Today}"
+                                xmlns:sys="clr-namespace:System;assembly=mscorlib"/>
+                    <Button Text="Request Rental"
+                            Command="{Binding RequestRentalCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                            TextColor="White"
+                            HeightRequest="50"
+                            CornerRadius="8"/>
+                </StackLayout>
+            </Border>
+
+            <!-- Reviews -->
+            <Label Text="Reviews" FontSize="18" FontAttributes="Bold"/>
+            <CollectionView ItemsSource="{Binding Reviews}" EmptyView="No reviews yet.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5" Padding="15"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <StackLayout Spacing="4">
+                                <Label Text="{Binding Reviewer.FullName}" FontAttributes="Bold" FontSize="14"/>
+                                <Label Text="{Binding Rating, StringFormat='⭐ {0}/5'}" FontSize="13"/>
+                                <Label Text="{Binding Comment}" FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#555, Dark=#bbb}"/>
+                            </StackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>
