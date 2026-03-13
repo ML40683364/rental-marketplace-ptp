@@ -24,9 +24,20 @@ public class User
     public DateTime? DeletedAt { get; set; }
     public bool IsActive { get; set; } = true;
 
-    // Navigation properties
+    // Many-to-many: A user can have multiple roles (e.g., Admin, Renter, Owner).
     public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
-    
+
+    // One-to-many: A user owns multiple items.
+    public ICollection<Item> Items { get; set; } = new List<Item>();
+
+    // One-to-many: A user can have multiple rentals (as a renter).
+    public ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+
+    // One-to-many: A user can write multiple reviews.
+    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+
+
     [NotMapped]
     public string FullName => $"{FirstName} {LastName}";
 }
