@@ -107,6 +107,26 @@ public partial class MainViewModel : BaseViewModel
         await _navigationService.NavigateToAsync("TempPage");
     }
 
+    // Navigation commands for main dashboard features
+    // Each command navigates to a different section of the app based on user selection
+    // When the user taps a card, MAUI calls the matching command, which tells the navigation service to go to that page.
+    [RelayCommand]
+    private async Task NavigateToBrowseItemsAsync() // goes to ItemsListPage
+    {
+        await _navigationService.NavigateToAsync("ItemsListPage");
+    }
+
+    [RelayCommand]
+    private async Task NavigateToNearbyItemsAsync() // goes to NearbyItemsPage
+    {
+        await _navigationService.NavigateToAsync("NearbyItemsPage");
+    }
+
+    [RelayCommand]
+    private async Task NavigateToMyRentalsAsync() // goes to RentalsPage
+    {
+        await _navigationService.NavigateToAsync("RentalsPage");
+    }
 
     /// @brief Navigates to the user list page
     /// @details Relay command that navigates to the user management page, admin only
