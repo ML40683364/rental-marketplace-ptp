@@ -1,29 +1,42 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- AboutPage: shows app info — logo, title, version, and a message -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:StarterApp.ViewModels"
              x:Class="StarterApp.Views.AboutPage">
+
+        <!-- connects this page to AboutViewModel, which provides the data (Title, Version, Message) -->
         <ContentPage.BindingContext>
                 <viewModels:AboutViewModel/>
         </ContentPage.BindingContext>
+
+        <!-- main vertical layout, stacks everything top to bottom -->
         <VerticalStackLayout Spacing="10"
-                        Margin="10">
+                             Margin="10">
+
+                <!-- header row: logo image + app title + version side by side -->
                 <HorizontalStackLayout Spacing="10">
                         <Image Source="dotnet_bot.png"
                                SemanticProperties.Description="The dot net bot waving hello!"
                                HeightRequest="64"/>
+                        <!-- {Binding Title} pulls the value from AboutViewModel.Title -->
                         <Label FontSize="22"
-                                        FontAttributes="Bold"
-                                        Text="{Binding Title}"
-                                        VerticalOptions="End"/>
+                               FontAttributes="Bold"
+                               Text="{Binding Title}"
+                               VerticalOptions="End"/>
+                        <!-- {Binding Version} pulls the value from AboutViewModel.Version -->
                         <Label FontSize="22"
-                                        Text="{Binding Version}"
-                                        VerticalOptions="End"/>
+                               Text="{Binding Version}"
+                               VerticalOptions="End"/>
                 </HorizontalStackLayout>
 
+                <!-- description text, pulled from AboutViewModel.Message -->
                 <Label Text="{Binding Message}"/>
+
+                <!-- button that triggers ShowMoreInfoCommand in the ViewModel when tapped -->
                 <Button Text="Learn more..."
-                                Command="{Binding ShowMoreInfoCommand}"/>
+                        Command="{Binding ShowMoreInfoCommand}"/>
+
         </VerticalStackLayout>
 
 </ContentPage>

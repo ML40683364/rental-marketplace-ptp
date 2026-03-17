@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- UserDetailPage: edit a user's name, email, active status, and roles — or delete them -->
+<!-- used for both editing existing users and creating new ones (ViewModel handles both cases) -->
+<!-- data and commands live in UserDetailViewModel -->
+<!-- Shell.BackButtonBehavior="{x:Null}" removes the default back button — navigation is controlled by the ViewModel -->
 <ContentPage x:Class="StarterApp.Views.UserDetailPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="{Binding PageTitle}"
              Shell.BackButtonBehavior="{x:Null}">
 
+    <!-- Home button in the toolbar — goes back to the dashboard -->
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Home"
                      Command="{Binding NavigateToDashboardCommand}"

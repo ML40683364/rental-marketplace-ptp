@@ -1,58 +1,80 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- ItemsListPage: scrollable list of all rental items — tap one to open its detail page -->
+<!-- data and commands live in ItemsListViewModel -->
 <ContentPage x:Class="StarterApp.Views.ItemsListPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:StarterApp.ViewModels"
              Title="{Binding Title}">
 
+    <!-- toolbar button in the top-right corner — triggers CreateItemCommand to open CreateItemPage -->
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="+ List Item"
-                     Command="{Binding CreateItemCommand}" />
+                     Command="{Binding CreateItemCommand}"/>
     </ContentPage.ToolbarItems>
 
+    <!-- RefreshView: lets the user pull down to reload the list -->
     <RefreshView IsRefreshing="{Binding IsBusy}"
                  Command="{Binding LoadItemsCommand}">
-        <StackLayout Padding="15" Spacing="10">
+        <StackLayout Padding="15"
+                Spacing="10">
 
-            <!-- Error -->
+            <!-- error banner: only visible when HasError is true in the ViewModel -->
             <Border BackgroundColor="#FFEBEE"
                     Stroke="#F44336"
                     StrokeThickness="1"
                     Padding="15"
                     IsVisible="{Binding HasError}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}"
+                        TextColor="#D32F2F"
+                        FontSize="14"/>
             </Border>
 
-            <!-- Items List -->
+            <!-- CollectionView: efficiently renders a scrollable list of items -->
+            <!-- EmptyView is shown when the Items list is empty -->
             <CollectionView ItemsSource="{Binding Items}"
                             EmptyView="No items available. Pull to refresh.">
                 <CollectionView.ItemTemplate>
+                    <!-- DataTemplate defines how each item in the list looks -->
                     <DataTemplate>
                         <Border Margin="0,5"
                                 Padding="15"
                                 BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
                                 Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
-                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <!-- TapGestureRecognizer: makes the whole card tappable -->
+                            <!-- AncestorType reaches up to the ViewModel since we're inside a DataTemplate -->
+                            <!-- CommandParameter="{Binding .}" passes the current item as the argument -->
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ItemsListViewModel}}, Path=SelectItemCommand}"
                                                       CommandParameter="{Binding .}"/>
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="*,Auto">
-                                <StackLayout Grid.Column="0" Spacing="4">
+                                <!-- left column: title, location, short description -->
+                                <StackLayout Grid.Column="0"
+                                        Spacing="4">
                                     <Label Text="{Binding Title}"
                                            FontSize="16"
                                            FontAttributes="Bold"/>
                                     <Label Text="{Binding Location}"
                                            FontSize="13"
                                            TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                                    <!-- TailTruncation adds "..." if text is too long -->
                                     <Label Text="{Binding Description}"
                                            FontSize="12"
                                            TextColor="{AppThemeBinding Light=#888, Dark=#999}"
                                            MaxLines="2"
                                            LineBreakMode="TailTruncation"/>
                                 </StackLayout>
-                                <StackLayout Grid.Column="1" VerticalOptions="Center" HorizontalOptions="End">
+                                <!-- right column: price per day -->
+                                <StackLayout Grid.Column="1"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="End">
                                     <Label Text="{Binding DailyRate, StringFormat='£{0:F2}'}"
                                            FontSize="16"
                                            FontAttributes="Bold"

@@ -1,6 +1,9 @@
+// Defines a containerised environment
 {
     "name": "MAUI Dev Environment",
-    "dockerComposeFile": ["../docker-compose.yml"],
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
     "service": "app",
     "workspaceFolder": "/workspace",
     "customizations": {
@@ -14,9 +17,14 @@
     },
     "remoteUser": "root",
     "portsAttributes": {
-        "5037": { "onAutoForward": "ignore" },
-        "5554": { "onAutoForward": "silent" },
-        "5555": { "onAutoForward": "silent" }
+        "5037": {
+            "onAutoForward": "ignore"
+        },
+        "5554": {
+            "onAutoForward": "silent"
+        },
+        "5555": {
+            "onAutoForward": "silent"
+        }
     }
 }
-

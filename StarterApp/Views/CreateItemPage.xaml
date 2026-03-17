@@ -1,62 +1,113 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- CreateItemPage: form for listing a new item for rent (title, description, daily rate, location) -->
+<!-- data and save/cancel logic live in CreateItemViewModel -->
 <ContentPage x:Class="StarterApp.Views.CreateItemPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="{Binding Title}">
 
+    <!-- ScrollView allows the form to scroll if it doesn't fit the screen -->
     <ScrollView>
-        <StackLayout Padding="20" Spacing="15">
+        <StackLayout Padding="20"
+                     Spacing="15">
 
-            <!-- Error -->
-            <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
-                    Padding="15" IsVisible="{Binding HasError}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+            <!-- error banner: only visible when HasError is true in the ViewModel -->
+            <Border BackgroundColor="#FFEBEE"
+                    Stroke="#F44336"
+                    StrokeThickness="1"
+                    Padding="15"
+                    IsVisible="{Binding HasError}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <!-- displays the error message text from the ViewModel -->
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#D32F2F"
+                       FontSize="14"/>
             </Border>
 
-            <Label Text="Title" FontSize="14" FontAttributes="Bold"/>
-            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}" StrokeThickness="1"
+            <!-- FIELD: item title — bound to CreateItemViewModel.ItemTitle -->
+            <Label Text="Title"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
                     BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                <Entry Text="{Binding ItemTitle}" Placeholder="e.g. Power Drill" Margin="15,10"/>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Entry Text="{Binding ItemTitle}"
+                       Placeholder="e.g. Power Drill"
+                       Margin="15,10"/>
             </Border>
 
-            <Label Text="Description" FontSize="14" FontAttributes="Bold"/>
-            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}" StrokeThickness="1"
+            <!-- FIELD: description — Editor (multiline) bound to CreateItemViewModel.Description -->
+            <Label Text="Description"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
                     BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                <Editor Text="{Binding Description}" Placeholder="Describe your item..."
-                        HeightRequest="100" Margin="15,10"/>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <!-- Editor = multiline text input, unlike Entry which is single line -->
+                <Editor Text="{Binding Description}"
+                        Placeholder="Describe your item..."
+                        HeightRequest="100"
+                        Margin="15,10"/>
             </Border>
 
-            <Label Text="Daily Rate (£)" FontSize="14" FontAttributes="Bold"/>
-            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}" StrokeThickness="1"
+            <!-- FIELD: daily rate — Keyboard="Numeric" forces the number keypad on mobile -->
+            <Label Text="Daily Rate (£)"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
                     BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                <Entry Text="{Binding DailyRateText}" Placeholder="e.g. 9.99"
-                       Keyboard="Numeric" Margin="15,10"/>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Entry Text="{Binding DailyRateText}"
+                       Placeholder="e.g. 9.99"
+                       Keyboard="Numeric"
+                       Margin="15,10"/>
             </Border>
 
-            <Label Text="Location" FontSize="14" FontAttributes="Bold"/>
-            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}" StrokeThickness="1"
+            <!-- FIELD: location — bound to CreateItemViewModel.Location -->
+            <Label Text="Location"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
                     BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
-                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
-                <Entry Text="{Binding Location}" Placeholder="e.g. Edinburgh" Margin="15,10"/>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Entry Text="{Binding Location}"
+                       Placeholder="e.g. Edinburgh"
+                       Margin="15,10"/>
             </Border>
 
+            <!-- triggers CreateItemViewModel.SaveCommand — validates and saves the item -->
             <Button Text="Save Item"
                     Command="{Binding SaveCommand}"
                     BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
-                    TextColor="White" HeightRequest="50" CornerRadius="8"
-                    FontAttributes="Bold" Margin="0,10,0,0"/>
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="8"
+                    FontAttributes="Bold"
+                    Margin="0,10,0,0"/>
 
+            <!-- triggers CreateItemViewModel.CancelCommand — discards and goes back -->
             <Button Text="Cancel"
                     Command="{Binding CancelCommand}"
                     BackgroundColor="Transparent"
                     TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
                     BorderWidth="1"
                     BorderColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
-                    HeightRequest="45" CornerRadius="8"/>
+                    HeightRequest="45"
+                    CornerRadius="8"/>
 
         </StackLayout>
     </ScrollView>

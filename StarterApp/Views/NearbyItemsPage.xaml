@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- NearbyItemsPage: GPS-based search — user sets a radius and finds items close to their location -->
+<!-- data and commands live in NearbyItemsViewModel -->
 <ContentPage x:Class="StarterApp.Views.NearbyItemsPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
@@ -7,19 +9,20 @@
 
     <StackLayout Padding="15" Spacing="15">
 
-        <!-- Error -->
+        <!-- error banner: only visible when HasError is true in the ViewModel -->
         <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
                 Padding="15" IsVisible="{Binding HasError}">
             <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
             <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
         </Border>
 
-        <!-- Location Info -->
+        <!-- shows the user's current GPS coordinates or a status message -->
         <Label Text="{Binding CurrentLocationText}" FontSize="13"
                TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"
                HorizontalOptions="Center"/>
 
-        <!-- Radius Slider -->
+        <!-- Slider: lets user pick search radius between 1km and 50km -->
+        <!-- the label on the right updates live as the slider moves -->
         <StackLayout Orientation="Horizontal" Spacing="10">
             <Label Text="Radius:" VerticalOptions="Center" FontSize="14"/>
             <Slider Minimum="1" Maximum="50" Value="{Binding RadiusKm}"
@@ -28,17 +31,19 @@
                    VerticalOptions="Center" FontSize="14" WidthRequest="40"/>
         </StackLayout>
 
-        <!-- Search Button -->
+        <!-- triggers NearbyItemsViewModel.SearchNearbyCommand -->
+        <!-- InvertedBoolConverter disables the button while a search is already running -->
         <Button Text="Search Nearby"
                 Command="{Binding SearchNearbyCommand}"
                 IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
                 BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
                 TextColor="White" HeightRequest="50" CornerRadius="8" FontAttributes="Bold"/>
 
+        <!-- spinning indicator shown while search is in progress -->
         <ActivityIndicator IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}"
                            Color="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
 
-        <!-- Results -->
+        <!-- results list — same tap pattern as ItemsListPage -->
         <CollectionView ItemsSource="{Binding NearbyItems}" EmptyView="No items found nearby.">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -46,6 +51,7 @@
                             BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
                             Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
                         <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <!-- AncestorType reaches up to the ViewModel since we're inside a DataTemplate -->
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:NearbyItemsViewModel}}, Path=SelectItemCommand}"
                                                   CommandParameter="{Binding .}"/>

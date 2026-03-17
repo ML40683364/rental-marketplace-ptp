@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- RegisterPage: sign-up form — first name, last name, email, password, confirm password, accept terms -->
+<!-- data and commands live in RegisterViewModel -->
 <ContentPage x:Class="StarterApp.Views.RegisterPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"

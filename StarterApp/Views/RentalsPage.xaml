@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- RentalsPage: two lists — rentals you made, and rental requests on items you own -->
+<!-- data and commands live in RentalsViewModel -->
 <ContentPage x:Class="StarterApp.Views.RentalsPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="{Binding Title}">
 
+    <!-- pull down to refresh both lists -->
     <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding LoadRentalsCommand}">
         <ScrollView>
             <StackLayout Padding="15" Spacing="15">
 
-                <!-- Error -->
+                <!-- error banner: only visible when HasError is true in the ViewModel -->
                 <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
                         Padding="15" IsVisible="{Binding HasError}">
                     <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
                     <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
                 </Border>
 
-                <!-- My Rentals -->
+                <!-- SECTION 1: rentals the current user has requested from others -->
                 <Label Text="My Rentals" FontSize="18" FontAttributes="Bold"/>
                 <CollectionView ItemsSource="{Binding MyRentals}" EmptyView="No rentals yet.">
                     <CollectionView.ItemTemplate>
@@ -26,6 +29,7 @@
                                 <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
                                 <StackLayout Spacing="4">
                                     <Label Text="{Binding Item.Title}" FontSize="16" FontAttributes="Bold"/>
+                                    <!-- Status e.g. Requested / Approved / Rejected / Completed -->
                                     <Label Text="{Binding Status}" FontSize="13"
                                            TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
                                     <Label Text="{Binding StartDate, StringFormat='From: {0:dd MMM yyyy}'}" FontSize="12"/>
@@ -38,7 +42,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- Requests on My Items -->
+                <!-- SECTION 2: requests OTHER people have made to rent YOUR items -->
                 <Label Text="Requests on My Items" FontSize="18" FontAttributes="Bold" Margin="0,15,0,0"/>
                 <CollectionView ItemsSource="{Binding RentalsOnMyItems}" EmptyView="No requests on your items.">
                     <CollectionView.ItemTemplate>
@@ -52,8 +56,11 @@
                                     <Label Text="{Binding Renter.FullName, StringFormat='Requested by: {0}'}" FontSize="13"/>
                                     <Label Text="{Binding Status}" FontSize="13"
                                            TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                                    <!-- action buttons: only shown when Status = "Requested" -->
+                                    <!-- StringToBoolConverter converts the status string to true/false for IsVisible -->
                                     <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8"
                                           IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Requested}">
+                                        <!-- AncestorType={x:Type ContentPage} reaches up to the page's BindingContext (the ViewModel) -->
                                         <Button Grid.Column="0" Text="Approve"
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
                                                 CommandParameter="{Binding .}"
