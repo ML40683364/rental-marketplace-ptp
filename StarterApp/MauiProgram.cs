@@ -1,3 +1,5 @@
+// setting everything up before the app runs. connects everything together using dependency injection
+
 using Microsoft.Extensions.Logging;
 using StarterApp.ViewModels;
 using StarterApp.Database.Data;
@@ -9,7 +11,7 @@ namespace StarterApp;
 
 public static class MauiProgram
 {
-    public static MauiApp CreateMauiApp()
+    public static MauiApp CreateMauiApp() //Starts configuring app
     {
         var builder = MauiApp.CreateBuilder();
         builder
@@ -26,7 +28,10 @@ public static class MauiProgram
         // This is an example of dependency injection — the ViewModels do
         // not change regardless of which implementation is registered here.
         // -------------------------------------------------------------------
-        const bool useSharedApi = false;
+        const bool useSharedApi = true; // has changed to be true to connect to the shared API instead of local database.
+
+        // Always register AppDbContext — repositories need it regardless of which auth service is used
+        builder.Services.AddDbContext<AppDbContext>();
 
         if (useSharedApi)
         {
@@ -39,7 +44,6 @@ public static class MauiProgram
         }
         else
         {
-            builder.Services.AddDbContext<AppDbContext>();
             builder.Services.AddSingleton<IAuthenticationService, LocalAuthenticationService>();
         }
 

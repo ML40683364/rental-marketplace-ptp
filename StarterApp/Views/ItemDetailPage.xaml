@@ -4,6 +4,7 @@
 <ContentPage x:Class="StarterApp.Views.ItemDetailPage"
              xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              Title="{Binding Title}">
 
     <ScrollView>
@@ -69,14 +70,12 @@
                             TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
                     <!-- DatePicker: MinimumDate prevents picking a date in the past -->
                     <DatePicker Date="{Binding StartDate}"
-                            MinimumDate="{x:Static sys:DateTime.Today}"
-                                xmlns:sys="clr-namespace:System;assembly=mscorlib"/>
+                            MinimumDate="{x:Static sys:DateTime.Today}"/>
                     <Label Text="End Date"
                             FontSize="13"
                             TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
                     <DatePicker Date="{Binding EndDate}"
-                            MinimumDate="{x:Static sys:DateTime.Today}"
-                                xmlns:sys="clr-namespace:System;assembly=mscorlib"/>
+                            MinimumDate="{x:Static sys:DateTime.Today}"/>
                     <!-- triggers ItemDetailViewModel.RequestRentalCommand -->
                     <Button Text="Request Rental"
                             Command="{Binding RequestRentalCommand}"
