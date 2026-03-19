@@ -65,6 +65,24 @@ public class RentalRepository : IRentalRepository
         return rental;
     }
 
+    public async Task<Rental> UpdateAsync(Rental rental)
+    {
+        rental.UpdatedAt = DateTime.UtcNow;
+        _context.Rentals.Update(rental);
+        await _context.SaveChangesAsync();
+        return rental;
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var rental = await _context.Rentals.FindAsync(id);
+        if (rental != null)
+        {
+            _context.Rentals.Remove(rental);
+            await _context.SaveChangesAsync();
+        }
+    }
+
     public async Task<Rental> UpdateStatusAsync(int id, string newStatus)
     {
         var rental = await _context.Rentals.FindAsync(id)
