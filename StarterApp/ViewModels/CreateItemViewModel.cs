@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StarterApp.Database.Models;
@@ -10,6 +11,8 @@ public partial class CreateItemViewModel : BaseViewModel
     private readonly IRentalService _rentalService;
     private readonly IAuthenticationService _authService;
     private readonly INavigationService _navigationService;
+    private readonly ILocationService _locationService;
+    private readonly IApiService _apiService;
 
     [ObservableProperty]
     private string itemTitle = string.Empty;
@@ -20,15 +23,70 @@ public partial class CreateItemViewModel : BaseViewModel
     [ObservableProperty]
     private string dailyRateText = string.Empty;
 
+    // shows the user their detected coordinates on screen
     [ObservableProperty]
-    private string location = string.Empty;
+    private string locationText = "Default: Edinburgh (55.9533, -3.1883)";
 
-    public CreateItemViewModel(IRentalService rentalService, IAuthenticationService authService, INavigationService navigationService)
+    [ObservableProperty]
+    private ObservableCollection<Category> categories = new();
+
+    [ObservableProperty]
+    private Category selectedCategory;
+
+    // default to Edinburgh — makes sense since that's where the uni is
+    // user can override by tapping Get My Location if they want
+    private double? _latitude = 55.9533;
+    private double? _longitude = -3.1883;
+
+    public CreateItemViewModel(IRentalService rentalService, IAuthenticationService authService,
+        INavigationService navigationService, ILocationService locationService, IApiService apiService)
     {
         _rentalService = rentalService;
         _authService = authService;
         _navigationService = navigationService;
+        _locationService = locationService;
+        _apiService = apiService;
         Title = "List an Item";
+    }
+
+    // loads categories from the API when the page appears
+    [RelayCommand]
+    private async Task LoadCategoriesAsync()
+    {
+        try
+        {
+            var result = await _apiService.GetCategoriesAsync();
+            Categories = new ObservableCollection<Category>(result);
+            if (Categories.Any())
+                SelectedCategory = Categories.First();
+        }
+        catch (Exception ex)
+        {
+            SetError($"Could not load categories: {ex.Message}");
+        }
+    }
+
+    // gets the device GPS coordinates and shows them to the user
+    [RelayCommand]
+    private async Task GetLocationAsync()
+    {
+        try
+        {
+            var location = await _locationService.GetCurrentLocationAsync();
+            if (location == null)
+            {
+                SetError("Could not get location. Please enable location permissions.");
+                return;
+            }
+            _latitude = location.Value.Latitude;
+            _longitude = location.Value.Longitude;
+            LocationText = $"Location set: {_latitude:F4}, {_longitude:F4}";
+            ClearError();
+        }
+        catch (Exception ex)
+        {
+            SetError($"Location error: {ex.Message}");
+        }
     }
 
     [RelayCommand]
@@ -36,15 +94,27 @@ public partial class CreateItemViewModel : BaseViewModel
     {
         if (_authService.CurrentUser == null) return;
 
-        if (string.IsNullOrWhiteSpace(ItemTitle) || string.IsNullOrWhiteSpace(Location))
+        if (string.IsNullOrWhiteSpace(ItemTitle))
         {
-            SetError("Title and location are required.");
+            SetError("Title is required.");
             return;
         }
 
         if (!decimal.TryParse(DailyRateText, out var dailyRate) || dailyRate <= 0)
         {
             SetError("Please enter a valid daily rate.");
+            return;
+        }
+
+        if (_latitude == null || _longitude == null)
+        {
+            SetError("Please get your location first.");
+            return;
+        }
+
+        if (SelectedCategory == null)
+        {
+            SetError("Please select a category.");
             return;
         }
 
@@ -57,7 +127,9 @@ public partial class CreateItemViewModel : BaseViewModel
                 Title = ItemTitle,
                 Description = Description,
                 DailyRate = dailyRate,
-                Location = Location,
+                CategoryId = SelectedCategory.Id,
+                Latitude = _latitude,
+                Longitude = _longitude,
                 OwnerId = _authService.CurrentUser.Id,
                 IsAvailable = true
             };

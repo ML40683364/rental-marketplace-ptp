@@ -37,6 +37,9 @@ public class Rental
     // Financial Info
     public decimal TotalCost { get; set; }
 
+    // API returns totalPrice instead of totalCost - this maps to that field
+    public decimal TotalPrice { get; set; }
+
 
     // Timestamps
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;

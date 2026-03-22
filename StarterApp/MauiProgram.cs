@@ -1,4 +1,7 @@
-// setting everything up before the app runs. connects everything together using dependency injection
+// this is the entry point for the whole app's setup.
+// everything gets registered here - services, viewmodels, pages.
+// the useSharedApi flag at the top controls whether we talk to the
+// shared API or the local postgres database. changing it here is all you need to do.
 
 using Microsoft.Extensions.Logging;
 using StarterApp.ViewModels;
@@ -30,7 +33,8 @@ public static class MauiProgram
         // -------------------------------------------------------------------
         const bool useSharedApi = true; // has changed to be true to connect to the shared API instead of local database.
 
-        // Always register AppDbContext — repositories need it regardless of which auth service is used
+        // DbContext is always registered even in API mode because some
+        // parts of the app still reference it during startup
         builder.Services.AddDbContext<AppDbContext>();
 
         if (useSharedApi)
@@ -41,21 +45,19 @@ public static class MauiProgram
             };
             builder.Services.AddSingleton(httpClient);
             builder.Services.AddSingleton<IAuthenticationService, ApiAuthenticationService>();
+            builder.Services.AddSingleton<IApiService, ApiService>();
+            builder.Services.AddSingleton<IRentalService, ApiRentalService>();
         }
         else
         {
             builder.Services.AddSingleton<IAuthenticationService, LocalAuthenticationService>();
+            builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IItemRepository, StarterApp.Database.Data.Repositories.ItemRepository>();
+            builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IRentalRepository, StarterApp.Database.Data.Repositories.RentalRepository>();
+            builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IReviewRepository, StarterApp.Database.Data.Repositories.ReviewRepository>();
+            builder.Services.AddTransient<IRentalService, RentalService>();
         }
 
         builder.Services.AddSingleton<INavigationService, NavigationService>();
-
-        // Repositories
-        builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IItemRepository, StarterApp.Database.Data.Repositories.ItemRepository>();
-        builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IRentalRepository, StarterApp.Database.Data.Repositories.RentalRepository>();
-        builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IReviewRepository, StarterApp.Database.Data.Repositories.ReviewRepository>();
-
-        // Services
-        builder.Services.AddTransient<IRentalService, RentalService>();
         builder.Services.AddSingleton<ILocationService, LocationService>();
 
         // Rental marketplace pages

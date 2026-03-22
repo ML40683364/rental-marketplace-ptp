@@ -16,7 +16,15 @@ public partial class CreateItemPage : ContentPage
     // is more flexible because the ViewModel can be pre-loaded with data before the page opens
     public CreateItemPage(CreateItemViewModel viewModel)
     {
-        InitializeComponent();          // builds the UI from CreateItemPage.xaml
-        BindingContext = viewModel;     // connects the UI to the ViewModel so bindings work
+        InitializeComponent();
+        BindingContext = viewModel;
+    }
+
+    // load categories from the API as soon as the page appears
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        if (BindingContext is CreateItemViewModel vm)
+            await vm.LoadCategoriesCommand.ExecuteAsync(null);
     }
 }
