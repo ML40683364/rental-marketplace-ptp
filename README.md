@@ -142,3 +142,11 @@ adb install -r StarterApp/bin/Debug/net10.0-android/android-x64/com.companyname.
 
 ### dotnet build is enough for day-to-day work
 dotnet build
+
+## -------- ## 
+
+## extra notes regarding the API
+https://set09102-api.b-davison.workers.dev/#/Rentals/patch_RentalUpdateStatusEndpoint 
+
+all the API 
+https://set09102-api.b-davison.workers.dev/openapi.json

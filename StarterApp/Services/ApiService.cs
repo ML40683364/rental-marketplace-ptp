@@ -48,6 +48,7 @@ public class ApiService : IApiService
             throw new UnauthorizedAccessException("Invalid email or password");
 
         var authToken = await response.Content.ReadFromJsonAsync<AuthToken>();
+        // This is stores the JWT token 
         await SecureStorage.SetAsync("auth_token", authToken!.Token);
         return authToken;
     }
