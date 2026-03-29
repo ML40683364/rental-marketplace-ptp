@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
+// go look in the StarterApp.Database.Models folder - that's where Item and Rental are.
 using StarterApp.Database.Models;
 using StarterApp.Services;
 
@@ -12,6 +14,13 @@ public partial class ItemsListViewModel : BaseViewModel
     private readonly INavigationService _navigationService;
 
     [ObservableProperty]
+
+
+
+
+
+    // this is holds the list - UI automatically updates when this changes
+    // C# knows Item means Item.cs from that folder because of that import at the top
     private ObservableCollection<Item> items = new();
 
     [ObservableProperty]
@@ -25,6 +34,9 @@ public partial class ItemsListViewModel : BaseViewModel
     }
 
     [RelayCommand]
+
+
+    // it fetches items from the API, fills the list
     private async Task LoadItemsAsync()
     {
         if (IsBusy) return;
@@ -46,6 +58,9 @@ public partial class ItemsListViewModel : BaseViewModel
     }
 
     [RelayCommand]
+
+
+    // When tap an item, navigates to ItemDetailPage
     private async Task SelectItemAsync(Item item)
     {
         await _navigationService.NavigateToAsync("ItemDetailPage", new Dictionary<string, object>
@@ -55,6 +70,11 @@ public partial class ItemsListViewModel : BaseViewModel
     }
 
     [RelayCommand]
+
+
+
+
+    // When tap "+ List Item", navigates to CreateItemPage
     private async Task CreateItemAsync()
     {
         await _navigationService.NavigateToAsync("CreateItemPage");

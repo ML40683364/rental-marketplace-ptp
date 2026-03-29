@@ -34,7 +34,7 @@
                                            TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
                                     <Label Text="{Binding StartDate, StringFormat='From: {0:dd MMM yyyy}'}" FontSize="12"/>
                                     <Label Text="{Binding EndDate, StringFormat='To: {0:dd MMM yyyy}'}" FontSize="12"/>
-                                    <Label Text="{Binding TotalCost, StringFormat='Total: £{0:F2}'}"
+                                    <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
                                            FontSize="13" FontAttributes="Bold"/>
                                 </StackLayout>
                             </Border>
