@@ -12,16 +12,28 @@ public class ItemRepository : IItemRepository
         _context = context;
     }
 
-    public async Task<List<Item>> GetAllAsync()
+
+
+
+
+    // this method is tested in ItemRepositoryTests - GetAllAsync_ShouldReturnAllAvailableItems
+    // Both test 1 and test 2 run the exact same GetAllAsync() method but they check different things:
+    // Test 1 checks → did I get anything back at all? (Assert.NotEmpty)
+    // Test 2 checks → are all items available? (Assert.All IsAvailable = true)
+    public async Task<List<Item>> GetAllAsync() // Test 1 & 2
     {
         return await _context.Items
             .Include(i => i.Owner)
             .Include(i => i.Category)
-            .Where(i => i.IsAvailable)
+            .Where(i => i.IsAvailable) // this is what test 2 care about - it checks that we only get items where IsAvailable = true
             .ToListAsync();
     }
 
-    public async Task<Item?> GetByIdAsync(int id)
+
+
+
+
+    public async Task<Item?> GetByIdAsync(int id) // Test 3 & 4
     {
         return await _context.Items
             .Include(i => i.Owner)
@@ -29,13 +41,21 @@ public class ItemRepository : IItemRepository
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 
-    public async Task<List<Item>> GetByOwnerAsync(int ownerId)
+
+
+
+    // test 6 check that GetByOwnerAsync only returns items that belong to the specified owner (ownerId)
+    public async Task<List<Item>> GetByOwnerAsync(int ownerId) // Test 6
     {
         return await _context.Items
             .Include(i => i.Category)
             .Where(i => i.OwnerId == ownerId)
             .ToListAsync();
     }
+
+
+
+
 
     public async Task<List<Item>> GetByCategoryAsync(int categoryId)
     {
@@ -59,7 +79,7 @@ public class ItemRepository : IItemRepository
             .ToList();
     }
 
-    public async Task<Item> CreateAsync(Item item)
+    public async Task<Item> CreateAsync(Item item) // Test 5
     {
         item.CreatedAt = DateTime.UtcNow;
         item.UpdatedAt = DateTime.UtcNow;

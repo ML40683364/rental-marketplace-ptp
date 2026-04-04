@@ -7,6 +7,8 @@ namespace StarterApp.Database.Models;
 // item model - represents an item that can be rented by users. It includes details such as title, description, 
 // daily rental rate, location, and availability status. Each item is associated with a category and an owner (user). 
 // The model also includes timestamps for when the item was created and last updated. Sets Id as the primary key
+
+
 [Table("items")]
 [PrimaryKey(nameof(Id))]
 public class Item

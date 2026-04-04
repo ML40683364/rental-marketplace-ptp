@@ -56,7 +56,11 @@ public class RentalRepository : IRentalRepository
             .ToListAsync();
     }
 
-    public async Task<Rental> CreateAsync(Rental rental)
+
+    //  Test 1 using this method to create a rental and save it to the database.
+    //  Test 2 using this method to create a rental first before updating its status.
+    //  Test 4 using this method to create an approved rental to test date overlap.
+    public async Task<Rental> CreateAsync(Rental rental)  // 1 + 2 
     {
         rental.CreatedAt = DateTime.UtcNow;
         rental.UpdatedAt = DateTime.UtcNow;
@@ -95,6 +99,9 @@ public class RentalRepository : IRentalRepository
     }
 
     // Checks no approved/active rental overlaps the requested dates
+
+    // Test 3 using this method to check if an item is available for certain dates.
+    //  Test 4 using this method to check if an item is available for certain dates when there is an overlapping rental.
     public async Task<bool> IsItemAvailableAsync(int itemId, DateTime start, DateTime end)
     {
         var conflict = await _context.Rentals

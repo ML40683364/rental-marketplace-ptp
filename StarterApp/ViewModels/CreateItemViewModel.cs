@@ -11,6 +11,8 @@ public partial class CreateItemViewModel : BaseViewModel
     private readonly IRentalService _rentalService;
     private readonly IAuthenticationService _authService;
     private readonly INavigationService _navigationService;
+
+    // beeing caaled by CreateItemViewModel and NearbyItemsViewModel to get the GPS coordinates from the phone
     private readonly ILocationService _locationService;
     private readonly IApiService _apiService;
 

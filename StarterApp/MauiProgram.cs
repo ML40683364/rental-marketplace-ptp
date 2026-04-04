@@ -71,6 +71,8 @@ public static class MauiProgram
         }
         else
         {
+
+            // this code came from the coursework example but it never runs because useSharedApi = true
             builder.Services.AddSingleton<IAuthenticationService, LocalAuthenticationService>(); // from the courswork
 
 

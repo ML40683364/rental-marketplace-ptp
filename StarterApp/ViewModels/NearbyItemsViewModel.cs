@@ -9,6 +9,8 @@ namespace StarterApp.ViewModels;
 public partial class NearbyItemsViewModel : BaseViewModel
 {
     private readonly IRentalService _rentalService;
+
+    // LocationService is beeing called from the NearbyItemsViewModel and CreateItemViewModel
     private readonly ILocationService _locationService;
     private readonly INavigationService _navigationService;
 
@@ -37,6 +39,7 @@ public partial class NearbyItemsViewModel : BaseViewModel
         ClearError();
         try
         {
+            // gets the GPS location from the phone
             var location = await _locationService.GetCurrentLocationAsync();
             if (location == null)
             {
@@ -45,6 +48,8 @@ public partial class NearbyItemsViewModel : BaseViewModel
             }
 
             CurrentLocationText = $"Lat: {location.Value.Latitude:F4}, Lon: {location.Value.Longitude:F4}";
+            //  passes those coordinates to RentalService to find nearby items
+            // IRentalService is being called 
             var result = await _rentalService.GetNearbyItemsAsync(location.Value.Latitude, location.Value.Longitude, RadiusKm);
             NearbyItems = new ObservableCollection<Item>(result);
 
@@ -64,6 +69,7 @@ public partial class NearbyItemsViewModel : BaseViewModel
     [RelayCommand]
     private async Task SelectItemAsync(Item item)
     {
+        // uses NavigationService to go to the item detail page when user taps an item
         await _navigationService.NavigateToAsync("ItemDetailPage", new Dictionary<string, object>
         {
             { "ItemId", item.Id }
