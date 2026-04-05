@@ -17,6 +17,9 @@ public interface IRentalService
     Task<List<Rental>> GetMyRentalsAsync(int renterId);
     Task<List<Rental>> GetRentalsForMyItemsAsync(int ownerId);
 
+    Task<Item> UpdateItemAsync(int itemId, string title, string description, decimal dailyRate, bool isAvailable);
+    Task DeleteItemAsync(int itemId);
+
     Task<Review> SubmitReviewAsync(int rentalId, int reviewerId, int rating, string comment);
     Task<List<Review>> GetReviewsForItemAsync(int itemId);
     Task<double> GetAverageRatingAsync(int itemId);

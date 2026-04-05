@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- EditItemPage: lets the owner update their item's title, description, daily rate, and availability -->
+<!-- data and commands live in EditItemViewModel -->
+<ContentPage x:Class="StarterApp.Views.EditItemPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <StackLayout Padding="15" Spacing="15">
+
+            <!-- error banner: only shown when HasError is true in the ViewModel -->
+            <Border BackgroundColor="#FFEBEE"
+                    Stroke="#F44336"
+                    StrokeThickness="1"
+                    Padding="15"
+                    IsVisible="{Binding HasError}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#D32F2F"
+                       FontSize="14"/>
+            </Border>
+
+            <!-- form card -->
+            <Border Padding="20"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+                <StackLayout Spacing="12">
+
+                    <Label Text="Title" FontSize="13"
+                           TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                    <Entry Text="{Binding ItemTitle}"
+                           Placeholder="Item title"
+                           FontSize="15"/>
+
+                    <Label Text="Description" FontSize="13"
+                           TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                    <Editor Text="{Binding ItemDescription}"
+                            Placeholder="Describe your item"
+                            HeightRequest="100"
+                            FontSize="14"/>
+
+                    <Label Text="Daily Rate (£)" FontSize="13"
+                           TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+                    <Entry Text="{Binding DailyRateText}"
+                           Placeholder="e.g. 9.99"
+                           Keyboard="Numeric"
+                           FontSize="15"/>
+
+                    <!-- toggle lets owner temporarily hide the item without deleting it -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                        <Label Grid.Column="0"
+                               Text="Available for rent"
+                               FontSize="15"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding IsAvailable}"
+                                OnColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                    </Grid>
+
+                </StackLayout>
+            </Border>
+
+            <!-- save button -->
+            <Button Text="Save Changes"
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}"
+                    BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="8"/>
+
+            <!-- cancel link -->
+            <Button Text="Cancel"
+                    Command="{Binding CancelCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                    HeightRequest="44"/>
+
+            <!-- delete button — red, at the bottom, requires confirmation before acting -->
+            <Button Text="Delete Item"
+                    Command="{Binding DeleteCommand}"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="8"
+                    Margin="0,10,0,0"/>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

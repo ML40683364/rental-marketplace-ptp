@@ -41,6 +41,21 @@ public class ApiRentalService : IRentalService
         return await _apiService.CreateItemAsync(request);
     }
 
+    public async Task<Item> UpdateItemAsync(int itemId, string title, string description, decimal dailyRate, bool isAvailable)
+    {
+        var request = new UpdateItemRequest
+        {
+            Title = title,
+            Description = description,
+            DailyRate = dailyRate,
+            IsAvailable = isAvailable
+        };
+        return await _apiService.UpdateItemAsync(itemId, request);
+    }
+
+    public Task DeleteItemAsync(int itemId)
+        => _apiService.DeleteItemAsync(itemId);
+
     // --- Rentals ---
 
     // the renterId param exists in IRentalService for the local DB version

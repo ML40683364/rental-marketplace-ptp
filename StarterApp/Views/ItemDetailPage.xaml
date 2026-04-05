@@ -7,6 +7,11 @@
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              Title="{Binding Title}">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Edit"
+                     Command="{Binding EditItemCommand}"/>
+    </ContentPage.ToolbarItems>
+
     <ScrollView>
         <StackLayout Padding="15"
                 Spacing="15">

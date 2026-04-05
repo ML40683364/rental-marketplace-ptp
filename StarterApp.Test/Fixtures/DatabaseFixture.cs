@@ -11,13 +11,13 @@ using StarterApp.Database.Models;
 
 namespace StarterApp.Test.Fixtures;
 
-public class DatabaseFixture : IDisposable
+public class DatabaseFixture : IDisposable //DatabaseFixture implements the IDisposable interface.
 {
     public AppDbContext Context { get; private set; }
 
     public DatabaseFixture()
     {
-        // UseInMemoryDatabase creates a fake database in memory — no PostgreSQL needed
+        // UseInMemoryDatabase creates a fake database in memory, no PostgreSQL needed
         // Guid.NewGuid() gives each test class its own fresh database so they don't conflict
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -25,8 +25,11 @@ public class DatabaseFixture : IDisposable
 
         Context = new AppDbContext(options);
         Context.Database.EnsureCreated();
-        SeedTestData();
+        SeedTestData();  // called here in the constructor to add some starting data to the fake database so tests have something to work with.
     }
+
+
+
 
     // SeedTestData adds some starting data so tests have something to work with
     private void SeedTestData()
@@ -47,8 +50,8 @@ public class DatabaseFixture : IDisposable
 
         var items = new List<Item>
         {
-            new Item { Id = 1, Title = "Electric Drill", DailyRate = 5.00m, CategoryId = 1, OwnerId = 1, IsAvailable = true, Latitude = 55.9533, Longitude = -3.1883 },
-            new Item { Id = 2, Title = "Camping Tent", DailyRate = 15.00m, CategoryId = 2, OwnerId = 1, IsAvailable = true, Latitude = 55.9600, Longitude = -3.1900 }
+            new Item { Id = 1, Title = "Wooden Big Hammer from China", DailyRate = 5.00m, CategoryId = 1, OwnerId = 1, IsAvailable = true, Latitude = 55.9533, Longitude = -3.1883 },
+            new Item { Id = 2, Title = "Pink Camping Mattress", DailyRate = 3.00m, CategoryId = 2, OwnerId = 1, IsAvailable = true, Latitude = 55.9600, Longitude = -3.1900 }
         };
         Context.Items.AddRange(items);
 
@@ -56,7 +59,7 @@ public class DatabaseFixture : IDisposable
     }
 
     // Dispose cleans up the database after all tests in the class are done
-    public void Dispose()
+    public void Dispose() // Cleans up the in-memory database after tests are done
     {
         Context.Dispose();
     }

@@ -18,6 +18,11 @@ using StarterApp.Test.Fixtures;               //   to use DatabaseFixture (the f
 
 namespace StarterApp.Test.Services;
 
+
+
+
+
+// RentalRepositoryTests.cs - refrencing the DatabaseFixture to get access to the fake database context for testing.
 public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the DatabaseFixture to set up a fake database before running   the tests. This gives us a clean, isolated database for testing without affecting the real database.
 {
     private readonly DatabaseFixture _fakeDb; //It stores the fake database so every test in this class can use it.
@@ -112,8 +117,8 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
 
     // --- Test 4 - checks double booking prevention
     // Two steps:
-    // 1. Books Camping Tent on days 10-12 with status "Approved"
-    // 2. Tries to book the same tent on the same dates → should return false
+    // 1. Books Pink Camping Mattress on days 10-12 with status "Approved"
+    // 2. Tries to book the same mattress on the same dates → should return false
     [Fact]
     public async Task IsItemAvailableAsync_ShouldReturnFalse_WhenDatesOverlap()
     {

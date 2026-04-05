@@ -132,6 +132,17 @@ public class ApiService : IApiService
         return MapToItem(dto!);
     }
 
+    public async Task DeleteItemAsync(int id)
+    {
+        var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Delete, $"items/{id}");
+        var response = await _httpClient.SendAsync(httpRequest);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new Exception(string.IsNullOrWhiteSpace(body) ? "Failed to delete item" : body);
+        }
+    }
+
     // --- Categories ---
 
     // no auth needed, categories are public

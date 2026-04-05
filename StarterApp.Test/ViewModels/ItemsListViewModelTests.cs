@@ -18,6 +18,13 @@ using StarterApp.Test.Fixtures;
 
 namespace StarterApp.Test.ViewModels;
 
+
+
+
+
+
+
+// ItemsListViewModelTests.cs - refrencing the DatabaseFixture to get access to the fake database context for testing.
 public class ItemsListViewModelTests : IClassFixture<DatabaseFixture>
 {
     private readonly DatabaseFixture _fakeDb;

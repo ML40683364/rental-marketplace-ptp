@@ -50,6 +50,7 @@ public interface IApiService
     Task<Item> GetItemAsync(int id);
     Task<Item> CreateItemAsync(CreateItemRequest request);
     Task<Item> UpdateItemAsync(int id, UpdateItemRequest request);
+    Task DeleteItemAsync(int id);
 
     // categories are used for filtering items
     Task<List<Category>> GetCategoriesAsync();

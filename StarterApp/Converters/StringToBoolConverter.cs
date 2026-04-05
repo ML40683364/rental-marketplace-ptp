@@ -11,9 +11,14 @@ public class StringToBoolConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is string stringValue)
+        if (value is string stringValue && parameter is string expected)
         {
-            return !string.IsNullOrWhiteSpace(stringValue);
+            return string.Equals(stringValue, expected, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (value is string s)
+        {
+            return !string.IsNullOrWhiteSpace(s);
         }
 
         return false;

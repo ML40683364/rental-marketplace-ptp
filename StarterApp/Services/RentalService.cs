@@ -27,6 +27,20 @@ public class RentalService : IRentalService
 
     public Task<Item> CreateItemAsync(Item item) => _items.CreateAsync(item);
 
+    public Task DeleteItemAsync(int itemId)
+        => _items.DeleteAsync(itemId);
+
+    public async Task<Item> UpdateItemAsync(int itemId, string title, string description, decimal dailyRate, bool isAvailable)
+    {
+        var item = await _items.GetByIdAsync(itemId)
+            ?? throw new Exception("Item not found");
+        item.Title = title;
+        item.Description = description;
+        item.DailyRate = dailyRate;
+        item.IsAvailable = isAvailable;
+        return await _items.UpdateAsync(item);
+    }
+
     // --- Rentals ---
 
     public async Task<Rental> RequestRentalAsync(int itemId, int renterId, DateTime start, DateTime end)

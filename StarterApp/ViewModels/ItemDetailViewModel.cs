@@ -25,6 +25,10 @@ public partial class ItemDetailViewModel : BaseViewModel
     [ObservableProperty]
     private double averageRating;
 
+    // true when the logged-in user is the owner of this item — controls Edit button visibility
+    [ObservableProperty]
+    private bool isOwner;
+
     [ObservableProperty]
     private DateTime startDate = DateTime.Today;
 
@@ -53,6 +57,7 @@ public partial class ItemDetailViewModel : BaseViewModel
             if (Item != null)
             {
                 Title = Item.Title;
+                IsOwner = _authService.CurrentUser?.Id == Item.OwnerId;
                 var reviewList = await _rentalService.GetReviewsForItemAsync(ItemId);
                 Reviews = new ObservableCollection<Review>(reviewList);
                 AverageRating = await _rentalService.GetAverageRatingAsync(ItemId);
@@ -66,6 +71,27 @@ public partial class ItemDetailViewModel : BaseViewModel
         {
             IsBusy = false;
         }
+    }
+
+    [RelayCommand]
+    private async Task EditItemAsync()
+    {
+        if (Item == null) return;
+
+        if (!IsOwner)
+        {
+            SetError("You can only edit your own items.");
+            return;
+        }
+        // pass all current values to EditItemPage so the form is pre-filled
+        await _navigationService.NavigateToAsync("EditItemPage", new Dictionary<string, object>
+        {
+            { "ItemId", Item.Id },
+            { "ItemTitle", Item.Title ?? string.Empty },
+            { "ItemDescription", Item.Description ?? string.Empty },
+            { "DailyRateText", Item.DailyRate.ToString("F2") },
+            { "IsAvailable", Item.IsAvailable }
+        });
     }
 
     [RelayCommand]

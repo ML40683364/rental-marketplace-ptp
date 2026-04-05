@@ -12,10 +12,23 @@ using StarterApp.Test.Fixtures;
 
 namespace StarterApp.Test.Repositories;
 
+
+// Every test class connects to this instead of a real database, so we can test our repository methods without needing 
+// real PostgreSQL connection.
+
+//  <DatabaseFixture> means that this test class will use the DatabaseFixture to set up a fake database for testing.
 public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 {
+
+
+    // _fakeDb holds the instance of DatabaseFixture, which gives access to the fake database context for tests.
     private readonly DatabaseFixture _fakeDb;
 
+
+
+
+
+    // ItemRepositoryTests.cs - refrencing the DatabaseFixture to get access to the fake database context for testing.
     public ItemRepositoryTests(DatabaseFixture fakeDatabase)
     {
         _fakeDb = fakeDatabase;
@@ -73,21 +86,33 @@ public class ItemRepositoryTests : IClassFixture<DatabaseFixture>
 
     //  --- TEST 3 --- checks that GetByIdAsync returns the correct item when it exists, and null when it doesn't exist.
 
-    //  If I search for Id 1, do I get the Electric Drill? - from data in DatabaseFixture.cs, Id 1 is the Electric Drill, 
+    //  If I search for Id 1, do I get the Wooden Big Hammer from China? - from data in DatabaseFixture.cs, Id 1 is the Wooden Big Hammer from China, 
     //  It also checks that if we search for an Id that doesn't exist (like 999), we get null back.
 
-    [Fact]
+    [Fact] // tells xUnit this is a test, when I run the test suite, xUnit finds every method marked with [Fact] and runs it. 
     public async Task GetByIdAsync_ShouldReturnCorrectItem()
     {
         // Arrange
+        // Sets up what the test needs. _fakeDb.Context is the fake in-memory database from DatabaseFixture, no real PostgreSQL needed.
+
         var repository = new ItemRepository(_fakeDb.Context);
 
-        // Act - get the item with Id = 1 (Electric Drill from our seed data)
-        var item = await repository.GetByIdAsync(1); // the 1 can be any Id that exists in the seed data, it doesn't have to be 1, but i know from DatabaseFixture.cs that Id 1 is the Electric Drill, so i check for that in the Assert step.
+        // Act
+        // get the item with Id = 1 (Wooden Big Hammer from China from our seed data)
+        // the 1 can be any Id that exists in the seed data, it doesn't have to be 1, but i know from 
+        // DatabaseFixture.cs that Id 1 is the Wooden Big Hammer from China, so i check for that in the Assert step.
+
+        // Calls the actual method being tested (line that does the real work, everything else supports it)
+
+        var item = await repository.GetByIdAsync(1);
 
         // Assert
+
+        // Two checks:
+        // NotNull — something was actually found, not just an empty                                                                                   
+        // Equal — what came back is exactly the right item, not just any item
         Assert.NotNull(item);
-        Assert.Equal("Electric Drill", item.Title);
+        Assert.Equal("Wooden Big Hammer from China", item.Title);
     }
 
 
