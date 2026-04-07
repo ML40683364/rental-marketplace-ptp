@@ -1,11 +1,25 @@
 name: My Build & Test Workflow
 
-on: [pull_request]
+# This workflow runs automatically when:
+#  push code to the main branch
+#  open or update a pull request targeting main
+#  every time I share my code, checking that it still works"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
+    # This tells GitHub which cloud computer to use for running the pipeline.
+    # ubuntu-latest = a fresh Linux machine spun up just for this run, then deleted when done.
+    # We use Linux because postgres service containers only work on Linux runners.
     runs-on: ubuntu-latest
 
+    # A service container is like running docker-compose in the background.
+    # GitHub starts this postgres database automatically before our steps run.
+    # Our tests need a database to run against - this is it.
     services:
       postgres:
         image: postgres:16
@@ -22,82 +36,116 @@ jobs:
           - 5432:5432
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Step 1: Get the code
+      # The cloud machine starts empty
+      # This step downloads code from GitHub onto the runner so the next steps can use it.
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup .NET 10
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
+      # Step 2: Install .NET
+      # The runner doesn't have .NET pre-installed in the right version.
+      # This installs .NET 10 so can run dotnet commands in the steps below.
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
 
-    - name: Restore workloads
-      run: dotnet workload restore ./StarterApp/StarterApp.csproj
+      # Step 3: Restore NuGet packages
+      # Like npm install - downloads all the libraries  projects depend on.
+      # only restore the Database and Test projects, not the MAUI app,
+      # because the MAUI app can't be built on Linux (it needs Android SDK).
+      - name: Restore dependencies
+        run: dotnet restore ./StarterApp.Database/StarterApp.Database.csproj && dotnet restore ./StarterApp.Test/StarterApp.Test.csproj
 
-    - name: Restore dependencies
-      run: dotnet restore ./StarterApp.sln
+      # Step 4: Install dotnet-coverage
+      # This is a tool that watches which lines of code get executed during tests.
+      # It produces a coverage.xml report that SonarCloud reads to show test coverage %.
+      - name: Install Tools
+        run: dotnet tool install --global dotnet-coverage
 
-    - name: Install Tools
-      run: dotnet tool install --global dotnet-coverage
+      # Step 5: Install Java (needed by the SonarCloud scanner tool)
+      # SonarCloud's scanner is a Java program, so Java must be installed first.
+      # This has nothing to do with our C# code - it's just a SonarCloud requirement.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: "zulu"
 
-    # Setup a Java JDK (needed for SonarCloud)
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: 17
-        distribution: 'zulu'
+      #  SonarCloud
+      #  SonarCloud is a code quality and security analysis tool. It checks for bugs, vulnerabilities, code smells, and test coverage.
 
-    # Cache SonarCloud packages
-    - name: Cache SonarCloud packages
-      uses: actions/cache@v4
-      with:
-        path: ~/sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
+      # Step 6: Cache SonarCloud packages
+      # Caching saves downloaded files between runs so we don't re-download them every time.
+      # If the cache exists from a previous run, this restores it. Speeds up the pipeline.
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-    # Cache SonarCloud scanner
-    - name: Cache SonarCloud scanner
-      id: cache-sonar-scanner
-      uses: actions/cache@v4
-      with:
-        path: ./.sonar/scanner
-        key: ${{ runner.os }}-sonar-scanner
-        restore-keys: ${{ runner.os }}-sonar-scanner
+      # Step 7: Cache SonarCloud scanner
+      # Same idea as above but specifically for the scanner tool itself.
+      # The id: label lets the next step check whether this cache was found or not.
+      - name: Cache SonarCloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: ./.sonar/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
 
-    # Install SonarCloud scanner if not cached
-    - name: Install SonarCloud scanner
-      if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-      run: |
-        mkdir -p .sonar/scanner
-        dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-        echo "$PWD/.sonar/scanner" >> $GITHUB_PATH
+      # Step 8: Install SonarCloud scanner (only if not already cached)
+      # The "if:" means this step is skipped when the scanner was found in cache.
+      # If it wasn't cached, this downloads and installs the scanner tool.
+      - name: Install SonarCloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p .sonar/scanner
+          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
+          echo "$PWD/.sonar/scanner" >> $GITHUB_PATH
 
-    # Start SonarCloud analysis
-    - name: Start Sonar Analysis
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin \
-        /k:"ml40683364_rental-marketplace-ptp" \
-        /o:"ml40683364" \
-        /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
-        /d:sonar.host.url="https://sonarcloud.io" \
-        /d:sonar.scanner.scanAll=false \
-        /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+      # Step 9: Start SonarCloud analysis
+      # This tells SonarCloud "start watching" - from this point on, everything that
+      # happens (build, test) is recorded. The SONAR_TOKEN is a secret key stored
+      # in GitHub Settings so it's not visible in the code.
+      - name: Start Sonar Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          ./.sonar/scanner/dotnet-sonarscanner begin \
+          /k:"ml40683364_rental-marketplace-ptp" \
+          /o:"ml40683364" \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.scanner.scanAll=false \
+          /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
 
-    # Build project
-    - name: Build project
-      env:
-        ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
-      run: dotnet build ./StarterApp.sln --framework net10.0
+      # Step 10: Build the project
+      # Compiles the code to check there are no errors.
+      # We pass the database connection string as an environment variable
+      # so the code can find the postgres container started at the top.
+      # We skip the MAUI app (StarterApp/) because it needs Android SDK which
+      # isn't available on ubuntu - we only build the Database and Test projects.
+      - name: Build project
+        env:
+          ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
+        run: dotnet build ./StarterApp.Database/StarterApp.Database.csproj && dotnet build ./StarterApp.Test/StarterApp.Test.csproj
 
-    # Run tests and collect coverage
-    - name: Test
-      env:
-        ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
-      run: dotnet-coverage collect "dotnet test ./StarterApp.sln --framework net10.0" -f xml -o "coverage.xml"
+      # Step 11: Run tests and collect coverage
+      # Runs all xUnit tests in the Test project.
+      # dotnet-coverage wraps around the test run and records which lines were hit.
+      # The result is saved to coverage.xml which SonarCloud reads in the next step.
+      - name: Test
+        env:
+          ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
+        run: dotnet-coverage collect "dotnet test ./StarterApp.Test/StarterApp.Test.csproj" -f xml -o "coverage.xml"
 
-    # End SonarCloud analysis
-    - name: End Sonar Analysis
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+      # Step 12: End SonarCloud analysis
+      # Tells SonarCloud "stop watching" and sends all the collected data (code + coverage)
+      # to sonarcloud.io for analysis. Results appear on the SonarCloud dashboard.
+      - name: End Sonar Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
