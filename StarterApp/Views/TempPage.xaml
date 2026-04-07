@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!-- TempPage: placeholder page used during development — just displays a message -->
+<!-- ViewModel is set here in the XAML directly (not injected via the constructor) -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="StarterApp.Views.TempPage"
              xmlns:vm="clr-namespace:StarterApp.ViewModels"
              Title="{Binding Title}">
 
+    <!-- ViewModel created directly in XAML — simpler approach used for basic/placeholder pages -->
     <ContentPage.BindingContext>
         <vm:TempViewModel />
     </ContentPage.BindingContext>
 
     <VerticalStackLayout>
-        <Label 
+        <!-- displays whatever message TempViewModel.Message contains -->
+        <Label
             Text="{Binding Message}"
             FontSize="24"
-            VerticalOptions="Center" 
+            VerticalOptions="Center"
             HorizontalOptions="Center" />
     </VerticalStackLayout>
 </ContentPage>

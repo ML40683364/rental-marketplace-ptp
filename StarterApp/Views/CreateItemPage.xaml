@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="StarterApp.Views.CreateItemPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <StackLayout Padding="20"
+                     Spacing="15">
+
+            <!-- error banner -->
+            <Border BackgroundColor="#FFEBEE"
+                    Stroke="#F44336"
+                    StrokeThickness="1"
+                    Padding="15"
+                    IsVisible="{Binding HasError}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}"
+                       TextColor="#D32F2F"
+                       FontSize="14"/>
+            </Border>
+
+            <!-- title -->
+            <Label Text="Title"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+
+
+
+                <!-- Title field. The user types the item title here -->
+                <Entry Text="{Binding ItemTitle}"
+                       Placeholder="e.g. Power Drill"
+                       Margin="15,10"/>
+            </Border>
+
+            <!-- description -->
+            <Label Text="Description"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+
+
+                <!-- Description field - the user types the item description here -->
+                <Editor Text="{Binding Description}"
+                        Placeholder="Describe your item..."
+                        HeightRequest="100"
+                        Margin="15,10"/>
+            </Border>
+
+            <!-- daily rate -->
+            <Label Text="Daily Rate (£)"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+
+
+                <!-- This is the Daily Rate field -->
+                <Entry Text="{Binding DailyRateText}"
+                       Placeholder="e.g. 9.99"
+                       Keyboard="Numeric"
+                       Margin="15,10"/>
+            </Border>
+
+            <!-- category picker - loads from API -->
+            <Label Text="Category"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}"
+                    StrokeThickness="1"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="8"/>
+                </Border.StrokeShape>
+
+
+
+                <!-- Category picker - this is from loads from API -->
+                <Picker ItemsSource="{Binding Categories}"
+                        SelectedItem="{Binding SelectedCategory}"
+                        ItemDisplayBinding="{Binding Name}"
+                        Margin="15,10"/>
+            </Border>
+
+            <!-- location - uses GPS instead of a text field -->
+            <Label Text="Location"
+                   FontSize="14"
+                   FontAttributes="Bold"/>
+            <Label Text="{Binding LocationText}"
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light=#555, Dark=#aaa}"/>
+
+
+
+            <!-- Get Location button - this uses GPS to get the user's current location -->
+            <!-- on the emulator GPS doesn't work properly. That's why the ViewModel has the Edinburgh default hardcoded:  -->
+            <!-- for now only to pass mark : "Default: Edinburgh (55.9533, -3.1883)" -->
+            <Button Text="Get My Location"
+                    Command="{Binding GetLocationCommand}"
+                    BackgroundColor="{AppThemeBinding Light=#e8e0f7, Dark=#2a2040}"
+                    TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                    HeightRequest="45"
+                    CornerRadius="8"/>
+
+            <!-- save button -->
+            <Button Text="Save Item"
+                    Command="{Binding SaveCommand}"
+                    BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="8"
+                    FontAttributes="Bold"
+                    Margin="0,10,0,0"/>
+
+            <!-- cancel button -->
+            <Button Text="Cancel"
+                    Command="{Binding CancelCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                    BorderWidth="1"
+                    BorderColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                    HeightRequest="45"
+                    CornerRadius="8"/>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

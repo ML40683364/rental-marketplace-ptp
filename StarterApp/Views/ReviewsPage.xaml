@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- ReviewsPage: submit a star rating and comment for an item, and see all existing reviews -->
+<!-- data and commands live in ReviewsViewModel -->
+<ContentPage x:Class="StarterApp.Views.ReviewsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+
+            <!-- error banner: only visible when HasError is true in the ViewModel -->
+            <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
+                    Padding="15" IsVisible="{Binding HasError}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+            </Border>
+
+            <!-- SECTION 1: form to submit a new review -->
+            <Border Padding="20"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                <StackLayout Spacing="12">
+                    <Label Text="Leave a Review" FontSize="18" FontAttributes="Bold"/>
+
+                    <!-- Slider lets user pick 1–5 stars, the label below updates live -->
+                    <Label Text="Rating (1-5)" FontSize="14"/>
+                    <Slider Minimum="1" Maximum="5" Value="{Binding SelectedRating}"/>
+                    <Label Text="{Binding SelectedRating, StringFormat='⭐ {0} / 5'}"
+                           HorizontalOptions="Center" FontSize="14"/>
+
+                    <!-- multiline text input for the review comment -->
+                    <Label Text="Comment" FontSize="14"/>
+                    <Border Stroke="{AppThemeBinding Light=#ccc, Dark=#555}" StrokeThickness="1"
+                            BackgroundColor="{AppThemeBinding Light=#f9f9f9, Dark=#2a2a2a}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                        <Editor Text="{Binding Comment}" Placeholder="Share your experience..."
+                                HeightRequest="100" Margin="10,8"/>
+                    </Border>
+
+                    <!-- triggers ReviewsViewModel.SubmitReviewCommand -->
+                    <Button Text="Submit Review"
+                            Command="{Binding SubmitReviewCommand}"
+                            BackgroundColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"
+                            TextColor="White" HeightRequest="50" CornerRadius="8"
+                            FontAttributes="Bold"/>
+                </StackLayout>
+            </Border>
+
+            <!-- SECTION 2: list of all existing reviews for this item -->
+            <Label Text="Reviews" FontSize="18" FontAttributes="Bold"/>
+            <CollectionView ItemsSource="{Binding Reviews}" EmptyView="No reviews yet.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5" Padding="15"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                            <StackLayout Spacing="4">
+                                <Label Text="{Binding Reviewer.FullName}" FontAttributes="Bold" FontSize="14"/>
+                                <Label Text="{Binding Rating, StringFormat='⭐ {0}/5'}" FontSize="13"/>
+                                <Label Text="{Binding Comment}" FontSize="13"
+                                       TextColor="{AppThemeBinding Light=#555, Dark=#bbb}"/>
+                                <!-- formats the date e.g. "14 Mar 2026" -->
+                                <Label Text="{Binding CreatedAt, StringFormat='{0:dd MMM yyyy}'}"
+                                       FontSize="11" TextColor="{AppThemeBinding Light=#999, Dark=#777}"/>
+                            </StackLayout>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

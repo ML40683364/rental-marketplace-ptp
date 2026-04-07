@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿// It’s database context for RentalApp, bridge between C# code and the database.
+
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StarterApp.Database.Models;
@@ -34,9 +36,15 @@ public class AppDbContext : DbContext
         optionsBuilder.UseNpgsql(connectionString);
     }
 
+
+    // Each DbSet<-----> represents a table in the database.
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<Item> Items { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Rental> Rentals { get; set; }
+    public DbSet<Review> Reviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -73,6 +81,54 @@ public class AppDbContext : DbContext
             entity.HasOne(ur => ur.Role)
                   .WithMany(r => r.UserRoles)
                   .HasForeignKey(ur => ur.RoleId);
+        });
+        // Item configuration
+        modelBuilder.Entity<Item>(entity =>
+        {
+            entity.Property(e => e.Title).HasMaxLength(200);
+            entity.Property(e => e.Location).HasMaxLength(300);
+            entity.Property(e => e.DailyRate).HasPrecision(10, 2);
+        });
+
+        // Category configuration
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+        });
+
+        // Rental configuration
+        modelBuilder.Entity<Rental>(entity =>
+        {
+            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.TotalCost).HasPrecision(10, 2);
+
+            entity.HasOne(r => r.Item)
+                  .WithMany()
+                  .HasForeignKey(r => r.ItemId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(r => r.Renter)
+                  .WithMany()
+                  .HasForeignKey(r => r.RenterId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Review configuration
+        modelBuilder.Entity<Review>(entity =>
+        {
+            entity.Property(e => e.Comment).HasMaxLength(1000);
+
+            entity.HasOne(r => r.Rental)
+                  .WithMany(rental => rental.Reviews)
+                  .HasForeignKey(r => r.RentalId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.Reviewer)
+                  .WithMany()
+                  .HasForeignKey(r => r.ReviewerId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
     }
 

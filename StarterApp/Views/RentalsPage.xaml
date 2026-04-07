@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- RentalsPage: two lists — rentals you made, and rental requests on items you own -->
+<!-- data and commands live in RentalsViewModel -->
+<ContentPage x:Class="StarterApp.Views.RentalsPage"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}">
+
+    <!-- pull down to refresh both lists -->
+    <RefreshView IsRefreshing="{Binding IsBusy}" Command="{Binding LoadRentalsCommand}">
+        <ScrollView>
+            <StackLayout Padding="15" Spacing="15">
+
+                <!-- error banner: only visible when HasError is true in the ViewModel -->
+                <Border BackgroundColor="#FFEBEE" Stroke="#F44336" StrokeThickness="1"
+                        Padding="15" IsVisible="{Binding HasError}">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="8"/></Border.StrokeShape>
+                    <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F" FontSize="14"/>
+                </Border>
+
+                <!-- SECTION 1: rentals the current user has requested from others -->
+                <Label Text="My Rentals" FontSize="18" FontAttributes="Bold"/>
+                <CollectionView ItemsSource="{Binding MyRentals}" EmptyView="No rentals yet.">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,5" Padding="15"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                <StackLayout Spacing="4">
+                                    <Label Text="{Binding Item.Title}" FontSize="16" FontAttributes="Bold"/>
+                                    <!-- Status e.g. Requested / Approved / Rejected / Completed -->
+                                    <Label Text="{Binding Status}" FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                                    <Label Text="{Binding StartDate, StringFormat='From: {0:dd MMM yyyy}'}" FontSize="12"/>
+                                    <Label Text="{Binding EndDate, StringFormat='To: {0:dd MMM yyyy}'}" FontSize="12"/>
+                                    <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
+                                           FontSize="13" FontAttributes="Bold"/>
+                                </StackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- SECTION 2: requests OTHER people have made to rent YOUR items -->
+                <Label Text="Requests on My Items" FontSize="18" FontAttributes="Bold" Margin="0,15,0,0"/>
+                <CollectionView ItemsSource="{Binding RentalsOnMyItems}" EmptyView="No requests on your items.">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,5" Padding="15"
+                                    BackgroundColor="{AppThemeBinding Light=White, Dark=#1e1e1e}"
+                                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                <StackLayout Spacing="6">
+                                    <Label Text="{Binding Item.Title}" FontSize="16" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Renter.FullName, StringFormat='Requested by: {0}'}" FontSize="13"/>
+                                    <Label Text="{Binding Status}" FontSize="13"
+                                           TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                                    <!-- action buttons: only shown when Status = "Requested" -->
+                                    <!-- StringToBoolConverter converts the status string to true/false for IsVisible -->
+                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8"
+                                          IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Requested}">
+                                        <!-- AncestorType={x:Type ContentPage} reaches up to the page's BindingContext (the ViewModel) -->
+                                        <Button Grid.Column="0" Text="Approve"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#4CAF50" TextColor="White" CornerRadius="6"/>
+                                        <Button Grid.Column="1" Text="Reject"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectRentalCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#F44336" TextColor="White" CornerRadius="6"/>
+                                        <Button Grid.Column="2" Text="Complete"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#FF9800" TextColor="White" CornerRadius="6"/>
+                                    </Grid>
+                                </StackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </StackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>
