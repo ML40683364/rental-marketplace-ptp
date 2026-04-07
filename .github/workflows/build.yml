@@ -115,7 +115,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
-          /k:"ml40683364_rental-marketplace-ptp" \
+          /k:"ML40683364_rental-marketplace-ptp" \
           /o:"ml40683364" \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
           /d:sonar.host.url="https://sonarcloud.io" \
