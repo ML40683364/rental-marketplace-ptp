@@ -110,6 +110,9 @@ jobs:
       # This tells SonarCloud "start watching" - from this point on, everything that
       # happens (build, test) is recorded. The SONAR_TOKEN is a secret key stored
       # in GitHub Settings so it's not visible in the code.
+
+      ##  there are 4 steps that together make up the SonarCloud integration
+      ##  STEP 1 Start Sonar - Start watching
       - name: Start Sonar Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -128,6 +131,8 @@ jobs:
       # so the code can find the postgres container started at the top.
       # We skip the MAUI app (StarterApp/) because it needs Android SDK which
       # isn't available on ubuntu - we only build the Database and Test projects.
+
+      ##  STEP 2 SonarCloud - Build project
       - name: Build project
         env:
           ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
@@ -137,6 +142,8 @@ jobs:
       # Runs all xUnit tests in the Test project.
       # dotnet-coverage wraps around the test run and records which lines were hit.
       # The result is saved to coverage.xml which SonarCloud reads in the next step.
+
+      ##  STEP 3 SonarCloud - Run tests and collect coverage
       - name: Test
         env:
           ConnectionStrings__TestConnection: Host=postgres;Port=5432;Database=testdb;Username=test_user;Password=test_password
@@ -145,6 +152,8 @@ jobs:
       # Step 12: End SonarCloud analysis
       # Tells SonarCloud "stop watching" and sends all the collected data (code + coverage)
       # to sonarcloud.io for analysis. Results appear on the SonarCloud dashboard.
+
+      ##  STEP 4 SonarCloud - End analysis
       - name: End Sonar Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

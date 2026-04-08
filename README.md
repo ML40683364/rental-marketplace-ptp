@@ -1,6 +1,6 @@
 # My README.md Contents:
 
-Peer-to-Peer Rental Marketplace
+Peer-to-Peer Rental Marketplace - to view: Ctrl+Shift+V
 
 ## Project overview
 
@@ -333,3 +333,50 @@ https://set09102-api.b-davison.workers.dev/#/Rentals/patch_RentalUpdateStatusEnd
 
 all the API 
 https://set09102-api.b-davison.workers.dev/openapi.json
+
+## migration - concept came from the uni docs - adapted for my multi-project structure
+ The package-lock.json analogy for AppDbContextModelSnapshot.cs is a never edit it manually, always let EF regenerate it.
+
+
+   # Step 1 - delete broken migration
+  rm StarterApp.Database/Migrations/20260308191249_AddItemsTable.cs
+  rm StarterApp.Database/Migrations/20260308191249_AddItemsTable.Designer.cs
+
+  # Step 2 - generate fresh migration
+  dotnet ef migrations add AddMarketplaceTables --project StarterApp.Database --startup-project StarterApp.Migrations
+
+  # Step 3 - apply to database
+  dotnet ef database update --project StarterApp.Database --startup-project StarterApp.Migrations
+
+
+
+
+
+## AI Tool Usage
+
+### Tools Used
+
+- Claude 
+
+### Significant AI Interactions
+
+#### Interaction 1: EF Core Migration Commands for Multi-Project Structure
+**Date**: 2026-03-19
+**Tool**: ChatGPT
+**Prompt**: "How do I run EF Core migrations when my models are in a separate Database project and my startup project is a separate Migrations project?"
+**AI Suggestion**:
+```bash
+dotnet ef migrations add AddMarketplaceTables \
+  --project StarterApp.Database \
+  --startup-project StarterApp.Migrations
+
+dotnet ef database update \
+  --project StarterApp.Database \
+  --startup-project StarterApp.Migrations
+```
+**My Evaluation**: I first read the uni tutorial at https://edinburgh-napier.github.io/SET09102/tutorials/csharp/maui-mvvm-database/part4-advanced-migrations.html (Part 4: Advanced Migrations) which explained the concept of migrations really well,  how EF Core tracks changes and the Up()/Down() methods. But the tutorial showed simple single-project commands like `dotnet ef database update` with no extra flags, and when I tried those they just didn't work in my setup because I have three separate projects. I asked AI to help me figure out the right flags for a multi-project solution and it gave me `--project` and `--startup-project`. I didn't just copy and run it though, I checked what each flag actually does (one points to where the DbContext lives, the other to the entry point that has the connection string) and then I ran it and confirmed it worked by checking the migration file was generated correctly.
+**Final Implementation**: Used to generate `20260319163753_AddMarketplaceTables.cs` which creates the `items`, `rentals`, `reviews` and `categories` tables. Also deleted the broken old migration `20260308191249_AddItemsTable` first before running these.
+**Testing**: Confirmed the migration applied successfully - the database tables were created and the app could read/write data correctly.
+
+I have created a visual image to understand the flow:
+![Migration](docs/images/migretionImage.png)

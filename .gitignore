@@ -22,6 +22,12 @@ postgres_data/
 [Ll]og/
 [Ll]ogs/
 
+# Test coverage reports
+TestResults/
+coverage.xml
+coverage.cobertura.xml
+*.cobertura.xml
+
 # User-specific files
 *.rsuser
 *.suo
