@@ -71,16 +71,22 @@ public class ApiService : IApiService
     // --- Items ---
 
     // supports optional filtering by category, search text, and page number
-    public async Task<List<Item>> GetItemsAsync(string category = null, string search = null, int page = 1)
+    // now returns TotalPages too so the ViewModel can show Next/Previous buttons
+    public async Task<(List<Item> Items, int TotalPages)> GetItemsAsync(string? category = null, string? search = null, int page = 1)
     {
         var query = $"items?page={page}";
-        if (!string.IsNullOrEmpty(category)) query += $"&category={category}";
-        if (!string.IsNullOrEmpty(search)) query += $"&search={search}";
+        if (!string.IsNullOrEmpty(category)) query += $"&category={Uri.EscapeDataString(category)}";
+        if (!string.IsNullOrEmpty(search)) query += $"&search={Uri.EscapeDataString(search)}";
 
         var response = await _httpClient.GetAsync(query);
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadFromJsonAsync<ItemsResponse>();
-        return result?.Items.Select(MapToItem).ToList() ?? new List<Item>();
+        var items = result?.Items.Select(MapToItem).ToList() ?? new List<Item>();
+
+        // the API always returns TotalPages - i was throwing it away before
+        // now i pass it back so the ViewModel knows when to disable the Next button
+        var totalPages = result?.TotalPages ?? 1;
+        return (items, totalPages);
     }
 
     // uses PostGIS on the server side - we just send coordinates and a radius

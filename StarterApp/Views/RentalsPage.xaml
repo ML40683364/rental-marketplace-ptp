@@ -28,7 +28,7 @@
                                     Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
                                 <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
                                 <StackLayout Spacing="4">
-                                    <Label Text="{Binding Item.Title}" FontSize="16" FontAttributes="Bold"/>
+                                    <Label Text="{Binding ItemTitle}" FontSize="16" FontAttributes="Bold"/>
                                     <!-- Status e.g. Requested / Approved / Rejected / Completed -->
                                     <Label Text="{Binding Status}" FontSize="13"
                                            TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
@@ -36,6 +36,26 @@
                                     <Label Text="{Binding EndDate, StringFormat='To: {0:dd MMM yyyy}'}" FontSize="12"/>
                                     <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
                                            FontSize="13" FontAttributes="Bold"/>
+
+                                    <!-- Mark as Returned: borrower taps this when they physically return the item -->
+                                    <Button Text="Mark as Returned"
+                                            IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Out for Rent}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkAsReturnedCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#2196F3" TextColor="White" CornerRadius="6"
+                                            Margin="0,4,0,0"/>
+
+                                    <!-- i added this button - it only appears when the rental is Completed
+                                         the same StringToBoolConverter pattern used above for Approve/Reject
+                                         tapping it navigates to ReviewsPage passing the rentalId -->
+                                    <Button Text="⭐ Leave Review"
+                                            IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Completed}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.LeaveReviewCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#512BD4"
+                                            TextColor="White"
+                                            CornerRadius="6"
+                                            Margin="0,4,0,0"/>
                                 </StackLayout>
                             </Border>
                         </DataTemplate>
@@ -52,15 +72,13 @@
                                     Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333}">
                                 <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
                                 <StackLayout Spacing="6">
-                                    <Label Text="{Binding Item.Title}" FontSize="16" FontAttributes="Bold"/>
-                                    <Label Text="{Binding Renter.FullName, StringFormat='Requested by: {0}'}" FontSize="13"/>
+                                    <Label Text="{Binding ItemTitle}" FontSize="16" FontAttributes="Bold"/>
+                                    <Label Text="{Binding BorrowerName, StringFormat='Requested by: {0}'}" FontSize="13"/>
                                     <Label Text="{Binding Status}" FontSize="13"
                                            TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
-                                    <!-- action buttons: only shown when Status = "Requested" -->
-                                    <!-- StringToBoolConverter converts the status string to true/false for IsVisible -->
-                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8"
+                                    <!-- Approve + Reject: shown when Requested -->
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8"
                                           IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Requested}">
-                                        <!-- AncestorType={x:Type ContentPage} reaches up to the page's BindingContext (the ViewModel) -->
                                         <Button Grid.Column="0" Text="Approve"
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ApproveRentalCommand}"
                                                 CommandParameter="{Binding .}"
@@ -69,11 +87,23 @@
                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RejectRentalCommand}"
                                                 CommandParameter="{Binding .}"
                                                 BackgroundColor="#F44336" TextColor="White" CornerRadius="6"/>
-                                        <Button Grid.Column="2" Text="Complete"
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="#FF9800" TextColor="White" CornerRadius="6"/>
                                     </Grid>
+
+                                    <!-- Mark Out for Rent: owner taps after approving, item physically handed over -->
+                                    <Button Text="Mark Out for Rent"
+                                            IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Approved}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarkAsOutForRentCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#FF9800" TextColor="White" CornerRadius="6"
+                                            Margin="0,4,0,0"/>
+
+                                    <!-- Complete: owner confirms item returned in good condition -->
+                                    <Button Text="Complete"
+                                            IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Returned}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CompleteRentalCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#4CAF50" TextColor="White" CornerRadius="6"
+                                            Margin="0,4,0,0"/>
                                 </StackLayout>
                             </Border>
                         </DataTemplate>

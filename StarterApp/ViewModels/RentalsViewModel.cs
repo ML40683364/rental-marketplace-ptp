@@ -10,6 +10,7 @@ public partial class RentalsViewModel : BaseViewModel
 {
     private readonly IRentalService _rentalService;
     private readonly IAuthenticationService _authService;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty]
     private ObservableCollection<Rental> myRentals = new();
@@ -17,17 +18,19 @@ public partial class RentalsViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<Rental> rentalsOnMyItems = new();
 
-    public RentalsViewModel(IRentalService rentalService, IAuthenticationService authService)
+    // i added INavigationService here so the Leave Review button can navigate to ReviewsPage
+    public RentalsViewModel(IRentalService rentalService, IAuthenticationService authService, INavigationService navigationService)
     {
         _rentalService = rentalService;
         _authService = authService;
+        _navigationService = navigationService;
         Title = "My Rentals";
     }
 
     [RelayCommand]
     private async Task LoadRentalsAsync()
     {
-        if (_authService.CurrentUser == null || IsBusy) return;
+        if (_authService.CurrentUser == null) return;
         IsBusy = true;
         ClearError();
         try
@@ -76,6 +79,36 @@ public partial class RentalsViewModel : BaseViewModel
         }
     }
 
+    // owner taps this after approving - marks item as physically handed over
+    [RelayCommand]
+    private async Task MarkAsOutForRentAsync(Rental rental)
+    {
+        try
+        {
+            await _rentalService.MarkAsOutForRentAsync(rental.Id);
+            await LoadRentalsAsync();
+        }
+        catch (Exception ex)
+        {
+            SetError(ex.Message);
+        }
+    }
+
+    // borrower taps this when they physically return the item
+    [RelayCommand]
+    private async Task MarkAsReturnedAsync(Rental rental)
+    {
+        try
+        {
+            await _rentalService.MarkAsReturnedAsync(rental.Id);
+            await LoadRentalsAsync();
+        }
+        catch (Exception ex)
+        {
+            SetError(ex.Message);
+        }
+    }
+
     [RelayCommand]
     private async Task CompleteRentalAsync(Rental rental)
     {
@@ -88,5 +121,16 @@ public partial class RentalsViewModel : BaseViewModel
         {
             SetError(ex.Message);
         }
+    }
+
+    // i added this so the borrower can navigate to ReviewsPage after a rental is Completed
+    // the rentalId is passed so ReviewsViewModel knows which rental to submit the review for
+    [RelayCommand]
+    private async Task LeaveReviewAsync(Rental rental)
+    {
+        await _navigationService.NavigateToAsync("ReviewsPage", new Dictionary<string, object>
+        {
+            { "RentalId", rental.Id }
+        });
     }
 }

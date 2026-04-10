@@ -17,8 +17,14 @@ public class ApiRentalService : IRentalService
 
     // --- Items ---
 
-    public Task<List<Item>> GetAvailableItemsAsync()
-        => _apiService.GetItemsAsync();
+    public async Task<PagedItemsResult> GetAvailableItemsAsync(string? category = null, string? search = null, int page = 1)
+    {
+        var (items, totalPages) = await _apiService.GetItemsAsync(category, search, page);
+        return new PagedItemsResult { Items = items, TotalPages = totalPages, CurrentPage = page };
+    }
+
+    public Task<List<Category>> GetCategoriesAsync()
+        => _apiService.GetCategoriesAsync();
 
     public Task<List<Item>> GetNearbyItemsAsync(double latitude, double longitude, double radiusKm = 10)
         => _apiService.GetNearbyItemsAsync(latitude, longitude, radiusKm);
@@ -79,6 +85,12 @@ public class ApiRentalService : IRentalService
     public async Task<Rental> MarkAsOutForRentAsync(int rentalId)
     {
         await _apiService.UpdateRentalStatusAsync(rentalId, "Out for Rent");
+        return await _apiService.GetRentalAsync(rentalId);
+    }
+
+    public async Task<Rental> MarkAsReturnedAsync(int rentalId)
+    {
+        await _apiService.UpdateRentalStatusAsync(rentalId, "Returned");
         return await _apiService.GetRentalAsync(rentalId);
     }
 

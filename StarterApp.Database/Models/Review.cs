@@ -28,5 +28,11 @@ public class Review
 
     public string Comment { get; set; } = string.Empty;
 
+    // i added this because the API returns reviewerName as a flat string
+    // the Reviewer navigation property is null after deserialisation so
+    // Reviewer.FullName would show blank - this captures the name directly
+    [NotMapped]
+    public string? ReviewerName { get; set; }
+
     public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 }

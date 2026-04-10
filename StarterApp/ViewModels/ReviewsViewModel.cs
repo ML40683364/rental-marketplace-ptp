@@ -1,7 +1,5 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using StarterApp.Database.Models;
 using StarterApp.Services;
 
 namespace StarterApp.ViewModels;
@@ -16,11 +14,23 @@ public partial class ReviewsViewModel : BaseViewModel
     [ObservableProperty]
     private int rentalId;
 
+    // slider returns a double but the API only accepts integer 1-5
+    // i use (int) cast when submitting to make sure it sends a whole number
+    // NotifyPropertyChangedFor means StarDisplay updates live as the slider moves
     [ObservableProperty]
-    private ObservableCollection<Review> reviews = new();
+    [NotifyPropertyChangedFor(nameof(StarDisplay))]
+    private double selectedRating = 5;
 
-    [ObservableProperty]
-    private int selectedRating = 5;
+    // builds a visual star string like ★★★☆☆ for 3/5
+    // filled stars = selected rating, empty stars = the rest up to 5
+    public string StarDisplay
+    {
+        get
+        {
+            var filled = (int)SelectedRating;
+            return new string('★', filled) + new string('☆', 5 - filled);
+        }
+    }
 
     [ObservableProperty]
     private string comment = string.Empty;
@@ -30,30 +40,7 @@ public partial class ReviewsViewModel : BaseViewModel
         _rentalService = rentalService;
         _authService = authService;
         _navigationService = navigationService;
-        Title = "Reviews";
-    }
-
-    partial void OnRentalIdChanged(int value) => _ = LoadReviewsAsync();
-
-    [RelayCommand]
-    private async Task LoadReviewsAsync()
-    {
-        if (IsBusy) return;
-        IsBusy = true;
-        ClearError();
-        try
-        {
-            var rental = await _rentalService.GetReviewsForItemAsync(RentalId);
-            Reviews = new ObservableCollection<Review>(rental);
-        }
-        catch (Exception ex)
-        {
-            SetError($"Failed to load reviews: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        Title = "Leave a Review";
     }
 
     [RelayCommand]
@@ -64,10 +51,12 @@ public partial class ReviewsViewModel : BaseViewModel
         ClearError();
         try
         {
-            await _rentalService.SubmitReviewAsync(RentalId, _authService.CurrentUser.Id, SelectedRating, Comment);
+            // cast to int because the API expects integer rating 1-5, slider gives a double
+            await _rentalService.SubmitReviewAsync(RentalId, _authService.CurrentUser.Id, (int)SelectedRating, Comment);
+
+            // reset the form and go back to the rentals page
             Comment = string.Empty;
             SelectedRating = 5;
-            await LoadReviewsAsync();
             await _navigationService.NavigateBackAsync();
         }
         catch (Exception ex)

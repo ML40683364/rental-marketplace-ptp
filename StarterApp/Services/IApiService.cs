@@ -45,7 +45,8 @@ public interface IApiService
     Task<User> GetUserProfileAsync(int userId);
 
     // browsing and managing items
-    Task<List<Item>> GetItemsAsync(string category = null, string search = null, int page = 1);
+    // returns items plus how many pages total - needed for pagination buttons
+    Task<(List<Item> Items, int TotalPages)> GetItemsAsync(string? category = null, string? search = null, int page = 1);
     Task<List<Item>> GetNearbyItemsAsync(double lat, double lon, double radius = 5.0, string category = null);
     Task<Item> GetItemAsync(int id);
     Task<Item> CreateItemAsync(CreateItemRequest request);

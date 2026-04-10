@@ -18,7 +18,16 @@ public class RentalService : IRentalService
 
     // --- Items ---
 
-    public Task<List<Item>> GetAvailableItemsAsync() => _items.GetAllAsync();
+    // category, search and page are used by the API version
+    // local DB just returns everything - TotalPages is 1 since no server-side pagination
+    public async Task<PagedItemsResult> GetAvailableItemsAsync(string? category = null, string? search = null, int page = 1)
+    {
+        var items = await _items.GetAllAsync();
+        return new PagedItemsResult { Items = items, TotalPages = 1, CurrentPage = 1 };
+    }
+
+    public Task<List<Category>> GetCategoriesAsync()
+        => Task.FromResult(new List<Category>());
 
     public Task<List<Item>> GetNearbyItemsAsync(double latitude, double longitude, double radiusKm = 10)
         => _items.SearchNearbyAsync(latitude, longitude, radiusKm);
@@ -77,6 +86,9 @@ public class RentalService : IRentalService
 
     public Task<Rental> MarkAsOutForRentAsync(int rentalId)
         => _rentals.UpdateStatusAsync(rentalId, "OutForRent");
+
+    public Task<Rental> MarkAsReturnedAsync(int rentalId)
+        => _rentals.UpdateStatusAsync(rentalId, "Returned");
 
     public Task<Rental> CompleteRentalAsync(int rentalId)
         => _rentals.UpdateStatusAsync(rentalId, "Returned");

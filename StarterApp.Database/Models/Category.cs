@@ -21,6 +21,12 @@ public class Category
     // Description of the category
     public string Description { get; set; } = string.Empty;
 
-    // Navigation - One category can have many items.   
+    // i added this because the API returns a slug (e.g. "tools") for filtering
+    // NotMapped means EF wont try to add this to the local database - its only used
+    // when we deserialise the API response and pass it as a query parameter
+    [NotMapped]
+    public string? Slug { get; set; }
+
+    // Navigation - One category can have many items.
     public ICollection<Item> Items { get; set; } = new List<Item>();
 }

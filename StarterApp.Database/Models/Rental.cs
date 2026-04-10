@@ -71,4 +71,13 @@ public class Rental
     // One rental can have many reviews - this is a one-to-many relationship.
     // ICollection is used instead of List because EF Core works better with it for navigation.
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+    // i added these because the API returns itemTitle and borrowerName as flat strings
+    // the Item and Renter navigation properties stay null after deserialisation
+    // so Item.Title and Renter.FullName would show blank in the UI without these
+    [NotMapped]
+    public string? ItemTitle { get; set; }
+
+    [NotMapped]
+    public string? BorrowerName { get; set; }
 }

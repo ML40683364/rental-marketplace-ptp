@@ -2,9 +2,21 @@ using StarterApp.Database.Models;
 
 namespace StarterApp.Services;
 
+// i created this class so the service can return both the items and the total page count
+// in one go - the ViewModel needs TotalPages to know when to disable the Next button
+public class PagedItemsResult
+{
+    public List<Item> Items { get; set; } = new();
+    public int TotalPages { get; set; } = 1;
+    public int CurrentPage { get; set; } = 1;
+}
+
 public interface IRentalService
 {
-    Task<List<Item>> GetAvailableItemsAsync();
+    // i added PagedItemsResult here so the service can tell the ViewModel
+    // how many pages there are - needed for the Next/Previous buttons
+    Task<PagedItemsResult> GetAvailableItemsAsync(string? category = null, string? search = null, int page = 1);
+    Task<List<Category>> GetCategoriesAsync();
     Task<List<Item>> GetNearbyItemsAsync(double latitude, double longitude, double radiusKm = 10);
     Task<Item?> GetItemByIdAsync(int id);
     Task<Item> CreateItemAsync(Item item);
@@ -13,6 +25,7 @@ public interface IRentalService
     Task<Rental> ApproveRentalAsync(int rentalId);
     Task<Rental> RejectRentalAsync(int rentalId);
     Task<Rental> MarkAsOutForRentAsync(int rentalId);
+    Task<Rental> MarkAsReturnedAsync(int rentalId);
     Task<Rental> CompleteRentalAsync(int rentalId);
     Task<List<Rental>> GetMyRentalsAsync(int renterId);
     Task<List<Rental>> GetRentalsForMyItemsAsync(int ownerId);

@@ -13,25 +13,66 @@
                      Command="{Binding CreateItemCommand}"/>
     </ContentPage.ToolbarItems>
 
-    <!-- RefreshView: lets the user pull down to reload the list -->
-    <RefreshView IsRefreshing="{Binding IsBusy}"
-                 Command="{Binding LoadItemsCommand}">
-        <StackLayout Padding="15"
-                Spacing="10">
+    <!-- i had to use a Grid here so the search bar and filters sit above the scrollable list
+         they were inside RefreshView before and that was blocking keyboard input - RefreshView
+         intercepts touch events which stopped the SearchBar and Picker from working
+         i also added a row at the bottom for the Next/Previous pagination buttons -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="15" RowSpacing="8">
 
-            <!-- error banner: only visible when HasError is true in the ViewModel -->
-            <Border BackgroundColor="#FFEBEE"
-                    Stroke="#F44336"
-                    StrokeThickness="1"
-                    Padding="15"
-                    IsVisible="{Binding HasError}">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="8"/>
-                </Border.StrokeShape>
-                <Label Text="{Binding ErrorMessage}"
-                        TextColor="#D32F2F"
-                        FontSize="14"/>
-            </Border>
+        <!-- i switched from SearchBar to Entry because SearchBar was unreliable on Windows MAUI
+             Entry is simpler and the text binding works properly -->
+        <!-- search row: text box on the left, Search button on the right -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Entry Grid.Column="0"
+                   Placeholder="Search items..."
+                   Text="{Binding SearchText}"
+                   ReturnCommand="{Binding LoadItemsCommand}"/>
+            <Button Grid.Column="1"
+                    Text="Search"
+                    Command="{Binding LoadItemsCommand}"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="8"
+                    Padding="12,0"/>
+        </Grid>
+
+        <!-- category filter row - picker on the left, clear button on the right
+             user picks a category then taps Search above to apply it
+             Clear resets both filters at once -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Picker Grid.Column="0"
+                    Title="All Categories"
+                    ItemsSource="{Binding Categories}"
+                    ItemDisplayBinding="{Binding Name}"
+                    SelectedItem="{Binding SelectedCategory}"/>
+            <Button Grid.Column="1"
+                    Text="Clear"
+                    Command="{Binding ClearFiltersCommand}"
+                    BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#444}"
+                    TextColor="{AppThemeBinding Light=#333, Dark=#eee}"
+                    CornerRadius="8"
+                    Padding="12,0"/>
+        </Grid>
+
+        <!-- error banner: only visible when HasError is true in the ViewModel -->
+        <Border Grid.Row="2"
+                BackgroundColor="#FFEBEE"
+                Stroke="#F44336"
+                StrokeThickness="1"
+                Padding="15"
+                IsVisible="{Binding HasError}">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="8"/>
+            </Border.StrokeShape>
+            <Label Text="{Binding ErrorMessage}"
+                    TextColor="#D32F2F"
+                    FontSize="14"/>
+        </Border>
+
+        <!-- RefreshView now only wraps the list - pull-to-refresh still works -->
+        <RefreshView Grid.Row="3"
+                     IsRefreshing="{Binding IsBusy}"
+                     Command="{Binding LoadItemsCommand}">
 
             <!-- CollectionView: efficiently renders a scrollable list of items -->
             <!-- EmptyView is shown when the Items list is empty -->
@@ -90,6 +131,34 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-        </StackLayout>
-    </RefreshView>
+        </RefreshView>
+
+        <!-- pagination bar - Previous on the left, page info in the middle, Next on the right
+             the buttons disable themselves when there is no previous/next page using IsEnabled binding -->
+        <Grid Grid.Row="4" ColumnDefinitions="Auto,*,Auto" Margin="0,4,0,0">
+            <Button Grid.Column="0"
+                    Text="&#8592; Previous"
+                    Command="{Binding PreviousPageCommand}"
+                    IsEnabled="{Binding HasPreviousPage}"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="8"
+                    Padding="16,10"/>
+            <Label Grid.Column="1"
+                   Text="{Binding PageInfo}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   FontSize="13"
+                   TextColor="{AppThemeBinding Light=#666, Dark=#aaa}"/>
+            <Button Grid.Column="2"
+                    Text="Next &#8594;"
+                    Command="{Binding NextPageCommand}"
+                    IsEnabled="{Binding HasNextPage}"
+                    BackgroundColor="#512BD4"
+                    TextColor="White"
+                    CornerRadius="8"
+                    Padding="16,10"/>
+        </Grid>
+
+    </Grid>
 </ContentPage>

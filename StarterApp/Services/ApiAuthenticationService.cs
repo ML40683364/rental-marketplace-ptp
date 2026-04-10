@@ -31,7 +31,7 @@ public class ApiAuthenticationService : IAuthenticationService
     //  LoginAsync - log in
     // log in - important method in this class, handles the entire login process, communicating with the API, handling the token, and updating the authentication state.
 
-    public async Task<AuthenticationResult> LoginAsync(string email, string password)
+    public async Task<AuthenticationResult> LoginAsync(string email, string password) //login
     {
         try
         {
