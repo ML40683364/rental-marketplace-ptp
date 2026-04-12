@@ -136,6 +136,14 @@ public partial class ItemsListViewModel : BaseViewModel
         await LoadItemsAsync();
     }
 
+    // auto-reload when the user picks a different category from the dropdown
+    // resets to page 1 so results start from the beginning
+    partial void OnSelectedCategoryChanged(Category? value)
+    {
+        CurrentPage = 1;
+        LoadItemsCommand.Execute(null);
+    }
+
     // clears both filters, resets to page 1 and reloads everything
     [RelayCommand]
     private async Task ClearFiltersAsync()

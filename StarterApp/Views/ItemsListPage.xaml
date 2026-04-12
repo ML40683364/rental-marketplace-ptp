@@ -71,7 +71,7 @@
 
         <!-- RefreshView now only wraps the list - pull-to-refresh still works -->
         <RefreshView Grid.Row="3"
-                     IsRefreshing="{Binding IsBusy}"
+                     IsRefreshing="{Binding IsBusy, Mode=OneWay}"
                      Command="{Binding LoadItemsCommand}">
 
             <!-- CollectionView: efficiently renders a scrollable list of items -->

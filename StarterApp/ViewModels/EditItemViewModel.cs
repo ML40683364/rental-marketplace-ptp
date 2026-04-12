@@ -75,15 +75,28 @@ public partial class EditItemViewModel : BaseViewModel
     [RelayCommand]
     private async Task DeleteAsync()
     {
+
+
+
+        //  soft delete button logic
+
+
+
+        // Instead of permanently removing the item from the database, the item is simply updated by setting 
+        // IsAvailable = false. This means the data still exists in the system, but it is hidden from users 
+        // because the “Browse Items” page only displays items where IsAvailable = true.
+
+
+
         // I originally tried to call DELETE /items/{id} on the API but kept getting 404.
         // After checking the Swagger docs carefully I realised the API has no DELETE endpoint at all.
         // The only way to "remove" an item is to set IsAvailable = false using PUT /items/{id}.
-        // This is actually called a "soft delete" — the item stays in the database but
+        // This is actually called a "soft delete" - the item stays in the database but
         // disappears from Browse Items because the API only returns IsAvailable = true items.
         //
         // I thought this was strange at first but then I learned this is how most real apps work.
-        // Think about Facebook — when you delete a post it does not actually disappear from their
-        // servers. Or when you cancel an Amazon order — the record stays for accounting and disputes.
+        // Think about Facebook - when you delete a post it does not actually disappear from their
+        // servers. Or when you cancel an Amazon order - the record stays for accounting and disputes.
         // Nothing truly disappears from the internet. Data is just hidden, not destroyed.
         //
         // For this app it also makes sense because if we hard-deleted an item, all the rentals
@@ -103,12 +116,12 @@ public partial class EditItemViewModel : BaseViewModel
         try
         {
             // I reuse UpdateItemAsync here instead of DeleteItemAsync because the API
-            // has no DELETE endpoint — PUT /items/{id} with isAvailable = false is
+            // has no DELETE endpoint - PUT /items/{id} with isAvailable = false is
             // the only way to hide an item from the marketplace.
             // The item disappears from Browse Items immediately after this call
             // because GET /items only returns items where isAvailable = true.
             await _rentalService.UpdateItemAsync(ItemId, ItemTitle, ItemDescription,
-                decimal.Parse(DailyRateText), false);
+                decimal.Parse(DailyRateText), false); // set IsAvailable = false to "soft delete" the item
 
             // I tried GoToAsync("//ItemsListPage") but got an absolute routing error.
             // PopToRootAsync() went too far and logged the user out.
