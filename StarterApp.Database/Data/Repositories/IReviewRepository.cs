@@ -2,14 +2,45 @@ using StarterApp.Database.Models;
 
 namespace StarterApp.Database.Data.Repositories;
 
-// Everything a repository needs to work with Reviews.
-// The 5 basics come from IRepository<Review>.
-// These below are unique to reviews.
-public interface IReviewRepository : IRepository<Review> // IReviewRepository is inheriting from a generic interface called IRepository<T> for Review.
+/// <summary>
+/// Repository interface for Reviews. Inherits the 5 basic operations
+/// from IRepository and adds review-specific methods.
+/// </summary>
+public interface IReviewRepository : IRepository<Review>
 {
-    Task<List<Review>> GetByRentalAsync(int rentalId);      // all reviews for a specific rental
-    Task<List<Review>> GetByItemAsync(int itemId);          // all reviews for a specific item
-    Task<List<Review>> GetByReviewerAsync(int reviewerId);  // all reviews written by a user
-    Task<double> GetAverageRatingAsync(int itemId);         // e.g. returns 4.5 stars
-    Task<bool> HasReviewedAsync(int rentalId, int reviewerId); // stops someone reviewing twice
+    /// <summary>
+    /// Gets all reviews linked to a specific rental.
+    /// </summary>
+    /// <param name="rentalId">The rental ID to get reviews for</param>
+    Task<List<Review>> GetByRentalAsync(int rentalId);
+
+    /// <summary>
+    /// Gets all reviews for a specific item across all its rentals.
+    /// Shown on the item detail page.
+    /// </summary>
+    /// <param name="itemId">The item ID to get reviews for</param>
+    Task<List<Review>> GetByItemAsync(int itemId);
+
+    /// <summary>
+    /// Gets all reviews written by a specific user.
+    /// </summary>
+    /// <param name="reviewerId">The user ID of the reviewer</param>
+    Task<List<Review>> GetByReviewerAsync(int reviewerId);
+
+    /// <summary>
+    /// Calculates the average star rating for an item across all its reviews.
+    /// Returns 0 if there are no reviews yet.
+    /// </summary>
+    /// <param name="itemId">The item to calculate the average for</param>
+    /// <returns>Average rating e.g. 4.5</returns>
+    Task<double> GetAverageRatingAsync(int itemId);
+
+    /// <summary>
+    /// Checks if a user has already reviewed a specific rental.
+    /// I use this to prevent the same person submitting two reviews for one rental.
+    /// </summary>
+    /// <param name="rentalId">The rental to check</param>
+    /// <param name="reviewerId">The user to check</param>
+    /// <returns>True if they already left a review, false if they haven't</returns>
+    Task<bool> HasReviewedAsync(int rentalId, int reviewerId);
 }

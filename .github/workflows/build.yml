@@ -158,3 +158,26 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      # Step 13: Install Doxygen
+      # Doxygen is a tool that reads the /// XML comments in the code
+      # and generates a HTML documentation website from them.
+      - name: Install Doxygen
+        run: sudo apt-get install -y doxygen
+
+      # Step 14: Generate Doxygen documentation
+      # Runs Doxygen using Doxyfile config which points at the Services
+      # and Repositories folders. Outputs HTML to docs/doxygen/html/
+      # This means every push to main regenerates the docs automatically.
+      - name: Generate Doxygen Documentation
+        run: doxygen Doxyfile
+
+      # Step 15: Upload Doxygen HTML as a build artifact
+      # This saves the generated HTML files so they can be downloaded
+      # from the GitHub Actions run page after the pipeline finishes.
+      # Without this step the files would be deleted when the runner shuts down.
+      - name: Upload Doxygen Documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-docs
+          path: docs/doxygen/html/
