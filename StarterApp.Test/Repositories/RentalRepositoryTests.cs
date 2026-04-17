@@ -16,21 +16,25 @@ using StarterApp.Test.Fixtures;               //   to use DatabaseFixture (the f
 
 // 5 test in total - these tests cover the main functionalities of RentalRepository:
 
-namespace StarterApp.Test.Services;
+namespace StarterApp.Test.Repositories;
 
 
 
 
 
 // RentalRepositoryTests.cs - refrencing the DatabaseFixture to get access to the fake database context for testing.
-public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the DatabaseFixture to set up a fake database before running   the tests. This gives us a clean, isolated database for testing without affecting the real database.
+public class RentalRepositoryTests : IDisposable
 {
-    private readonly DatabaseFixture _fakeDb; //It stores the fake database so every test in this class can use it.
+    private readonly DatabaseFixture _fakeDb;
+    private readonly RentalRepository _repository;
 
-    public RentalRepositoryTests(DatabaseFixture fakeDatabase)
+    public RentalRepositoryTests()
     {
-        _fakeDb = fakeDatabase;
+        _fakeDb = new DatabaseFixture();
+        _repository = new RentalRepository(_fakeDb.Context);
     }
+
+    public void Dispose() => _fakeDb.Dispose();
 
 
 
@@ -42,7 +46,6 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
     public async Task CreateAsync_ShouldSaveRental()
     {
         // Arrange
-        var repository = new RentalRepository(_fakeDb.Context);
         var rental = new Rental
         {
             ItemId = 1,
@@ -54,7 +57,7 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
         };
 
         // Act
-        var saved = await repository.CreateAsync(rental);
+        var saved = await _repository.CreateAsync(rental);
 
         // Assert
         Assert.True(saved.Id > 0);
@@ -73,27 +76,31 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
     // 2. Then changes it to "Approved" and checks it actually changed                                                     
     //This is testing the rental workflow -Requested → Approved.
 
-    [Fact]
-    public async Task UpdateStatusAsync_ShouldChangeStatus()
+    [Theory]
+    [InlineData("Requested", "Approved")]
+    [InlineData("Requested", "Rejected")]
+    [InlineData("Approved", "OutForRent")]
+    [InlineData("OutForRent", "Returned")]
+    [InlineData("Returned", "Completed")]
+    public async Task UpdateStatusAsync_ShouldChangeStatus(string fromStatus, string toStatus)
     {
-        // Arrange - first create a rental to update
-        var repository = new RentalRepository(_fakeDb.Context);
+        // Arrange
         var rental = new Rental
         {
             ItemId = 1,
             RenterId = 2,
             StartDate = DateTime.Today.AddDays(5),
             EndDate = DateTime.Today.AddDays(7),
-            Status = "Requested",
+            Status = fromStatus,
             TotalCost = 10.00m
         };
-        var saved = await repository.CreateAsync(rental);
+        var saved = await _repository.CreateAsync(rental);
 
-        // Act - approve it
-        var updated = await repository.UpdateStatusAsync(saved.Id, "Approved");
+        // Act
+        var updated = await _repository.UpdateStatusAsync(saved.Id, toStatus);
 
         // Assert
-        Assert.Equal("Approved", updated.Status);
+        Assert.Equal(toStatus, updated.Status);
     }
 
     // --- Test 3 - this test checks if the IsItemAvailableAsync method correctly identifies when an item is available for certain dates.
@@ -102,11 +109,8 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
     [Fact]
     public async Task IsItemAvailableAsync_ShouldReturnTrue_WhenNoDatesOverlap()
     {
-        // Arrange
-        var repository = new RentalRepository(_fakeDb.Context);
-
         // Act - check dates far in the future with no existing rentals
-        var available = await repository.IsItemAvailableAsync(1, DateTime.Today.AddDays(100), DateTime.Today.AddDays(102));
+        var available = await _repository.IsItemAvailableAsync(1, DateTime.Today.AddDays(100), DateTime.Today.AddDays(102));
 
         // Assert
         Assert.True(available);
@@ -123,7 +127,6 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
     public async Task IsItemAvailableAsync_ShouldReturnFalse_WhenDatesOverlap()
     {
         // Arrange - create an approved rental for specific dates
-        var repository = new RentalRepository(_fakeDb.Context);
         var rental = new Rental
         {
             ItemId = 2,
@@ -133,10 +136,10 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
             Status = "Approved",
             TotalCost = 30.00m
         };
-        await repository.CreateAsync(rental);
+        await _repository.CreateAsync(rental);
 
         // Act - try to book the same item on overlapping dates
-        var available = await repository.IsItemAvailableAsync(2, DateTime.Today.AddDays(10), DateTime.Today.AddDays(12));
+        var available = await _repository.IsItemAvailableAsync(2, DateTime.Today.AddDays(10), DateTime.Today.AddDays(12));
 
         // Assert - should not be available
         Assert.False(available);
@@ -151,7 +154,6 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
     public async Task GetByRenterAsync_ShouldReturnRentalsForThatRenter()
     {
         // Arrange - create a rental for renter with Id = 2
-        var repository = new RentalRepository(_fakeDb.Context);
         var rental = new Rental
         {
             ItemId = 1,
@@ -161,10 +163,10 @@ public class RentalRepositoryTests : IClassFixture<DatabaseFixture>  // use the 
             Status = "Requested",
             TotalCost = 5.00m
         };
-        await repository.CreateAsync(rental);
+        await _repository.CreateAsync(rental);
 
         // Act
-        var rentals = await repository.GetByRenterAsync(2);
+        var rentals = await _repository.GetByRenterAsync(2);
 
         // Assert
         Assert.NotEmpty(rentals);

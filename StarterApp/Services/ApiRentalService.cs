@@ -69,36 +69,18 @@ public class ApiRentalService : IRentalService
     public Task<Rental> RequestRentalAsync(int itemId, int renterId, DateTime start, DateTime end)
         => _apiService.RequestRentalAsync(itemId, start, end);
 
-    // status update then fetch the updated rental to return it
-    public async Task<Rental> ApproveRentalAsync(int rentalId)
+    // replace the 5 repeated methods with a private helper
+    private async Task<Rental> UpdateStatusAsync(int rentalId, string status)
     {
-        await _apiService.UpdateRentalStatusAsync(rentalId, "Approved");
+        await _apiService.UpdateRentalStatusAsync(rentalId, status);
         return await _apiService.GetRentalAsync(rentalId);
     }
 
-    public async Task<Rental> RejectRentalAsync(int rentalId)
-    {
-        await _apiService.UpdateRentalStatusAsync(rentalId, "Rejected");
-        return await _apiService.GetRentalAsync(rentalId);
-    }
-
-    public async Task<Rental> MarkAsOutForRentAsync(int rentalId)
-    {
-        await _apiService.UpdateRentalStatusAsync(rentalId, "Out for Rent");
-        return await _apiService.GetRentalAsync(rentalId);
-    }
-
-    public async Task<Rental> MarkAsReturnedAsync(int rentalId)
-    {
-        await _apiService.UpdateRentalStatusAsync(rentalId, "Returned");
-        return await _apiService.GetRentalAsync(rentalId);
-    }
-
-    public async Task<Rental> CompleteRentalAsync(int rentalId)
-    {
-        await _apiService.UpdateRentalStatusAsync(rentalId, "Completed");
-        return await _apiService.GetRentalAsync(rentalId);
-    }
+    public Task<Rental> ApproveRentalAsync(int rentalId) => UpdateStatusAsync(rentalId, "Approved");
+    public Task<Rental> RejectRentalAsync(int rentalId) => UpdateStatusAsync(rentalId, "Rejected");
+    public Task<Rental> MarkAsOutForRentAsync(int rentalId) => UpdateStatusAsync(rentalId, "Out for Rent");
+    public Task<Rental> MarkAsReturnedAsync(int rentalId) => UpdateStatusAsync(rentalId, "Returned");
+    public Task<Rental> CompleteRentalAsync(int rentalId) => UpdateStatusAsync(rentalId, "Completed");
 
     // same as renterId above - ownerId isn't needed, API uses the token
     public Task<List<Rental>> GetMyRentalsAsync(int renterId)

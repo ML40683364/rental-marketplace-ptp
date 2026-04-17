@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using StarterApp.Database.Models;
@@ -16,6 +17,28 @@ public class ApiService : IApiService
         _httpClient = httpClient;
     }
 
+    // replaces the repeated if (!response.IsSuccessStatusCode) blocks with one
+    // private helper that distinguishes between different HTTP error codes
+    private async Task HandleErrorResponse(HttpResponseMessage response)
+    {
+        var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.BadRequest:
+                throw new Exception(error?.Message ?? "Validation failed");
+            case HttpStatusCode.Unauthorized:
+                throw new UnauthorizedAccessException("Authentication required");
+            case HttpStatusCode.Forbidden:
+                throw new Exception("You do not have permission to perform this action");
+            case HttpStatusCode.NotFound:
+                throw new Exception("Resource not found");
+            case HttpStatusCode.Conflict:
+                throw new Exception(error?.Message ?? "Conflict error");
+            default:
+                throw new Exception(error?.Message ?? $"API error: {response.StatusCode}");
+        }
+    }
+
     // grabs the JWT token from secure storage and attaches it to the request
     // any endpoint that needs auth goes through this helper
     private async Task<HttpRequestMessage> CreateAuthenticatedRequest(HttpMethod method, string url)
@@ -32,11 +55,7 @@ public class ApiService : IApiService
     public async Task<User> RegisterAsync(string firstName, string lastName, string email, string password)
     {
         var response = await _httpClient.PostAsJsonAsync("auth/register", new { firstName, lastName, email, password });
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            throw new Exception(error?.Message ?? "Registration failed");
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
         return await response.Content.ReadFromJsonAsync<User>();
     }
 
@@ -114,11 +133,7 @@ public class ApiService : IApiService
         var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Post, "items");
         httpRequest.Content = JsonContent.Create(request);
         var response = await _httpClient.SendAsync(httpRequest);
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            throw new Exception(error?.Message ?? "Failed to create item");
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
         var dto = await response.Content.ReadFromJsonAsync<ApiItemDto>();
         return MapToItem(dto!);
     }
@@ -129,11 +144,7 @@ public class ApiService : IApiService
         var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Put, $"items/{id}");
         httpRequest.Content = JsonContent.Create(request);
         var response = await _httpClient.SendAsync(httpRequest);
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            throw new Exception(error?.Message ?? "Failed to update item");
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
         var dto = await response.Content.ReadFromJsonAsync<ApiItemDto>();
         return MapToItem(dto!);
     }
@@ -142,11 +153,7 @@ public class ApiService : IApiService
     {
         var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Delete, $"items/{id}");
         var response = await _httpClient.SendAsync(httpRequest);
-        if (!response.IsSuccessStatusCode)
-        {
-            var body = await response.Content.ReadAsStringAsync();
-            throw new Exception(string.IsNullOrWhiteSpace(body) ? "Failed to delete item" : body);
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
     }
 
     // --- Categories ---
@@ -173,11 +180,7 @@ public class ApiService : IApiService
             endDate = endDate.ToString("yyyy-MM-dd")
         });
         var response = await _httpClient.SendAsync(httpRequest);
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            throw new Exception(error?.Message ?? "Failed to request rental");
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
         return await response.Content.ReadFromJsonAsync<Rental>();
     }
 
@@ -219,11 +222,7 @@ public class ApiService : IApiService
         var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Patch, $"rentals/{rentalId}/status");
         httpRequest.Content = JsonContent.Create(new { status });
         var response = await _httpClient.SendAsync(httpRequest);
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            throw new Exception(error?.Message ?? "Failed to update rental status");
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
     }
 
     // --- Reviews ---
@@ -233,11 +232,7 @@ public class ApiService : IApiService
         var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Post, "reviews");
         httpRequest.Content = JsonContent.Create(new { rentalId, rating, comment });
         var response = await _httpClient.SendAsync(httpRequest);
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
-            throw new Exception(error?.Message ?? "Failed to submit review");
-        }
+        if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
         return await response.Content.ReadFromJsonAsync<Review>();
     }
 
