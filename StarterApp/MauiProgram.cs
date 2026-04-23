@@ -62,11 +62,18 @@ public static class MauiProgram
             };
 
             builder.Services.AddSingleton(httpClient);
-            // Originally, this was LocalAuthenticationService, but I changed it to ApiAuthenticationService to connect to the shared API instead of local database.
+
+            // Dependency Injection - API mode
+            // The pattern here is AddSingleton<Interface, Implementation>()
+            // This means: "whenever something asks for IAuthenticationService, give it ApiAuthenticationService"
+            // The ViewModel never knows which implementation it gets - it just asks for the interface.
+            // Originally this was LocalAuthenticationService - I changed it to ApiAuthenticationService
+            // to connect to the shared class API instead of the local database.
             builder.Services.AddSingleton<IAuthenticationService, ApiAuthenticationService>();
 
-
+            // same pattern - ViewModels ask for IApiService, they get ApiService (the HTTP client)
             builder.Services.AddSingleton<IApiService, ApiService>();
+            // ViewModels ask for IRentalService, they get ApiRentalService (talks to the shared API)
             builder.Services.AddSingleton<IRentalService, ApiRentalService>();
         }
         else
@@ -76,10 +83,14 @@ public static class MauiProgram
             builder.Services.AddSingleton<IAuthenticationService, LocalAuthenticationService>(); // from the courswork
 
 
-            // those part of the code are there for the local database mode — when useSharedApi = false
+            // Dependency Injection - local database mode (runs when useSharedApi = false)
+            // Same interface/implementation pattern but now pointing to local Repository classes
+            // instead of the API. The ViewModels stay exactly the same - only this file changes.
+            // This is the whole point of Dependency Injection - swap implementations without touching ViewModels.
             builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IItemRepository, StarterApp.Database.Data.Repositories.ItemRepository>();
             builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IRentalRepository, StarterApp.Database.Data.Repositories.RentalRepository>();
             builder.Services.AddTransient<StarterApp.Database.Data.Repositories.IReviewRepository, StarterApp.Database.Data.Repositories.ReviewRepository>();
+            // in local mode IRentalService gets RentalService (talks to local DB) instead of ApiRentalService
             builder.Services.AddTransient<IRentalService, RentalService>();
         }
 
@@ -90,10 +101,11 @@ public static class MauiProgram
 
 
 
-        // added these when I built the rentals page                                                                                                   
-        // not sure why this needs to be outside but it crashed without it
-        // TODO: remove TempPage later  
-
+        // Registering my new Marketplace Views and ViewModels
+        // AddTransient means a new instance is created every time the page is opened.
+        // This is important for pages like RentalsPage where data needs to refresh each visit.
+        // Each View and its ViewModel are registered as a pair - MAUI automatically
+        // injects the ViewModel into the View's constructor when the page is navigated to.
         builder.Services.AddTransient<ItemsListViewModel>();
         builder.Services.AddTransient<ItemsListPage>();
         builder.Services.AddTransient<ItemDetailViewModel>();

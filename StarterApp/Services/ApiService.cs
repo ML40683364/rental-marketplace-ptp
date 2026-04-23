@@ -5,7 +5,7 @@ using StarterApp.Database.Models;
 
 namespace StarterApp.Services;
 
-// This is the real HTTP implementation of IApiService.
+// This is the HTTP implementation of IApiService.
 // Every method here maps to one endpoint on the shared API.
 // Base URL is set in MauiProgram.cs so we just use relative paths here.
 public class ApiService : IApiService
@@ -89,6 +89,7 @@ public class ApiService : IApiService
 
     // --- Items ---
 
+    // HTTP layer for Stage 1 - called by ApiRentalService.GetAvailableItemsAsync()
     // supports optional filtering by category, search text, and page number
     // now returns TotalPages too so the ViewModel can show Next/Previous buttons
     public async Task<(List<Item> Items, int TotalPages)> GetItemsAsync(string? category = null, string? search = null, int page = 1)
@@ -169,6 +170,7 @@ public class ApiService : IApiService
 
     // --- Rentals ---
 
+    // HTTP layer for Stage 2 - called by ApiRentalService.RequestRentalAsync()
     // dates are sent as yyyy-MM-dd strings as the API expects
     public async Task<Rental> RequestRentalAsync(int itemId, DateTime startDate, DateTime endDate)
     {
@@ -227,6 +229,7 @@ public class ApiService : IApiService
 
     // --- Reviews ---
 
+    // HTTP layer for Stage 9 - called by ApiRentalService.SubmitReviewAsync()
     public async Task<Review> CreateReviewAsync(int rentalId, int rating, string comment)
     {
         var httpRequest = await CreateAuthenticatedRequest(HttpMethod.Post, "reviews");

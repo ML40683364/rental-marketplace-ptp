@@ -326,12 +326,10 @@ dotnet build
 
 
 
-## Doxygen documentation website on my local computer. 
+## Doxygen - Doxygen documentation website on my local computer. 
 file:///C:/Projects/StarterApp/docs/doxygen/html/hierarchy.html
 
-
-
-## To see the doxygen-docs artifact navigate here, click the latest run, scroll down and see the doxygen-docs artifact. That link will never change: 
+## Doxygen - To see the doxygen-docs artifact navigate here, click the latest run, scroll down and see the doxygen-docs artifact. That link will never change: 
 https://github.com/ML40683364/rental-marketplace-ptp/actions 
 
 

@@ -3,12 +3,20 @@ using StarterApp.Database.Models;
 
 namespace StarterApp.Services;
 
+// RentalService is the local database implementation of IRentalService.
+// It is only used when useSharedApi = false in MauiProgram.cs.
+// In API mode, ApiRentalService is used instead and this class is never called.
 public class RentalService : IRentalService
 {
     private readonly IItemRepository _items;
     private readonly IRentalRepository _rentals;
     private readonly IReviewRepository _reviews;
 
+    // Dependency Injection - Repositories are injected into this Service constructor.
+    // MauiProgram.cs registers the repositories and automatically provides them here.
+    // This Service never creates repositories itself - it just asks for the interfaces.
+    // This means the Service does not care whether data comes from PostgreSQL or anywhere else -
+    // it only knows it has something that implements IItemRepository, IRentalRepository, IReviewRepository.
     public RentalService(IItemRepository items, IRentalRepository rentals, IReviewRepository reviews)
     {
         _items = items;

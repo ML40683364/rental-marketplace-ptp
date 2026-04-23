@@ -15,36 +15,17 @@ public class Item
 {
 
     public int Id { get; set; }
-    // Title of the item
     [Required]
     public string Title { get; set; } = string.Empty;
-
-
-
-
-    // Description of the item
     public string Description { get; set; } = string.Empty;
-
-
-
-    // Daily rental rate for the item
     [Required]
     public decimal DailyRate { get; set; }
-
-
-
-    // Category FK (links to Category table)
     public int? CategoryId { get; set; }
 
     [ForeignKey(nameof(CategoryId))]
     public Category? Category { get; set; }
-
-
-
-    // Location of the item 
     [Required]
     public string Location { get; set; } = string.Empty;
-
 
 
     // For nearby search

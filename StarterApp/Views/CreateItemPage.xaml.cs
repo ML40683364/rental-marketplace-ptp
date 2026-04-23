@@ -1,6 +1,6 @@
 // CreateItemPage.xaml.cs — code-behind for CreateItemPage
 // The ViewModel is injected (passed in from outside) rather than created here directly.
-// This is called dependency injection — the app creates the ViewModel and hands it to this page.
+// This is dependency injection — the app creates the ViewModel and hands it to this page.
 
 using StarterApp.ViewModels;
 
