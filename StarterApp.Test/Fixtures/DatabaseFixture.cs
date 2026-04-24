@@ -5,6 +5,8 @@
 // database in memory that only exists while the tests are running.
 // This means tests are fast, isolated, and don't affect the real database.
 
+// Microsoft.EntityFrameworkCore.InMemory (Microsoft, 2024) - creates a fake in-memory database for testing
+// replaces real PostgreSQL so tests run fast and without any external dependencies
 using Microsoft.EntityFrameworkCore;
 using StarterApp.Database.Data;
 using StarterApp.Database.Models;

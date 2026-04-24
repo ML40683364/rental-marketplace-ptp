@@ -1,20 +1,10 @@
-//   These tests check RentalRepository,  saving rentals, updating status,
-//   checking if an item is available for certain dates.
-//   use DatabaseFixture to get a fake in-memory database.
+// This file originally had 5 tests that each wrote out a full Rental object inline every time.
+// I refactored it by extracting a CreateTestRentalAsync helper so the shared setup lives in one place,
+// and added 7 new tests to cover methods that had no coverage — bringing the total from 5 to 12.
 
-using StarterApp.Database.Data.Repositories;  //   to use RentalRepository to test it
-using StarterApp.Database.Models;             //   to use Rental and Item models
-using StarterApp.Test.Fixtures;               //   to use DatabaseFixture (the fake database) 
-
-
-// have to use both Rental and Item models 
-//    Rental — because we are saving and testing rentals
-//    Item — because a rental cannot exist without an item. Every rental must have an ItemId pointing to a real item  in the database 
-//    ItemId is the foreign key. It links every rental to a real item in the items table. A rental cannot exist in the database without pointing to a valid item.
-
-
-
-// 5 test in total - these tests cover the main functionalities of RentalRepository:
+using StarterApp.Database.Data.Repositories;
+using StarterApp.Database.Models;
+using StarterApp.Test.Fixtures;
 
 namespace StarterApp.Test.Repositories;
 
@@ -126,22 +116,13 @@ public class RentalRepositoryTests : IDisposable
     [Fact]
     public async Task IsItemAvailableAsync_ShouldReturnFalse_WhenDatesOverlap()
     {
-        // Arrange - create an approved rental for specific dates
-        var rental = new Rental
-        {
-            ItemId = 2,
-            RenterId = 2,
-            StartDate = DateTime.Today.AddDays(10),
-            EndDate = DateTime.Today.AddDays(12),
-            Status = "Approved",
-            TotalCost = 30.00m
-        };
-        await _repository.CreateAsync(rental);
+        // Arrange - create an approved rental for item 2 (Pink Camping Mattress)
+        await CreateTestRentalAsync(status: "Approved", daysOffset: 10, itemId: 2);
 
         // Act - try to book the same item on overlapping dates
         var available = await _repository.IsItemAvailableAsync(2, DateTime.Today.AddDays(10), DateTime.Today.AddDays(12));
 
-        // Assert - should not be available
+        // Assert
         Assert.False(available);
     }
 
@@ -153,17 +134,8 @@ public class RentalRepositoryTests : IDisposable
     [Fact]
     public async Task GetByRenterAsync_ShouldReturnRentalsForThatRenter()
     {
-        // Arrange - create a rental for renter with Id = 2
-        var rental = new Rental
-        {
-            ItemId = 1,
-            RenterId = 2,
-            StartDate = DateTime.Today.AddDays(20),
-            EndDate = DateTime.Today.AddDays(21),
-            Status = "Requested",
-            TotalCost = 5.00m
-        };
-        await _repository.CreateAsync(rental);
+        // Arrange
+        await CreateTestRentalAsync(daysOffset: 20);
 
         // Act
         var rentals = await _repository.GetByRenterAsync(2);
@@ -171,5 +143,128 @@ public class RentalRepositoryTests : IDisposable
         // Assert
         Assert.NotEmpty(rentals);
         Assert.All(rentals, r => Assert.Equal(2, r.RenterId));
+    }
+
+    // I noticed that before I added this helper, I was writing out the same Rental object
+    // over and over again in Tests 4 and 5 and all the new tests below - the same ItemId, RenterId,
+    // StartDate, EndDate, Status and TotalCost every single time. That is a DRY violation because
+    // if I ever needed to change something (like the RenterId or TotalCost), I would have had to
+    // find every single test and update them all one by one. That is how bugs sneak in.
+    //
+    // The solution was to write this helper method once and call it from every test that needs a rental.
+    // Now if something needs to change, I update it in one place and all the tests get the change for free.
+    // I got this idea from looking at ReviewRepositoryTests which already had the same pattern -
+    // once I understood why it was there I realised I needed the same thing here.
+    //
+    // I also added three optional parameters so each test can customise just the bits it cares about:
+    //   status   - most tests just need "Requested" but the double-booking test needs "Approved"
+    //   daysOffset - each test uses different future dates so they do not overlap with each other
+    //   itemId   - most tests use item 1 but the double-booking test specifically needs item 2 (Pink Camping Mattress)
+    // The default values mean tests that do not care about those details can just call CreateTestRentalAsync()
+    // with no arguments and get a sensible rental back without any noise in the test.
+    private async Task<Rental> CreateTestRentalAsync(string status = "Requested", int daysOffset = 30, int itemId = 1)
+    {
+        return await _repository.CreateAsync(new Rental
+        {
+            ItemId = itemId,
+            RenterId = 2,
+            StartDate = DateTime.Today.AddDays(daysOffset),
+            EndDate = DateTime.Today.AddDays(daysOffset + 2),
+            Status = status,
+            TotalCost = 10.00m
+        });
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ShouldReturnAllRentals()
+    {
+        // Arrange
+        await CreateTestRentalAsync();
+
+        // Act
+        var rentals = await _repository.GetAllAsync();
+
+        // Assert
+        Assert.NotEmpty(rentals);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnCorrectRental()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync(daysOffset: 40);
+
+        // Act
+        var found = await _repository.GetByIdAsync(rental.Id);
+
+        // Assert
+        Assert.NotNull(found);
+        Assert.Equal(rental.Id, found.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenRentalDoesNotExist()
+    {
+        // Act
+        var found = await _repository.GetByIdAsync(999999);
+
+        // Assert
+        Assert.Null(found);
+    }
+
+    [Fact]
+    public async Task GetByItemAsync_ShouldReturnRentalsForThatItem()
+    {
+        // Arrange
+        await CreateTestRentalAsync(daysOffset: 50);
+
+        // Act
+        var rentals = await _repository.GetByItemAsync(1);
+
+        // Assert
+        Assert.NotEmpty(rentals);
+        Assert.All(rentals, r => Assert.Equal(1, r.ItemId));
+    }
+
+    [Fact]
+    public async Task GetByStatusAsync_ShouldReturnRentalsWithMatchingStatus()
+    {
+        // Arrange
+        await CreateTestRentalAsync(status: "Approved", daysOffset: 60);
+
+        // Act
+        var rentals = await _repository.GetByStatusAsync("Approved");
+
+        // Assert
+        Assert.NotEmpty(rentals);
+        Assert.All(rentals, r => Assert.Equal("Approved", r.Status));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldSaveChanges()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync(daysOffset: 70);
+        rental.TotalCost = 99.00m;
+
+        // Act
+        var updated = await _repository.UpdateAsync(rental);
+
+        // Assert
+        Assert.Equal(99.00m, updated.TotalCost);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldRemoveRental()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync(daysOffset: 80);
+
+        // Act
+        await _repository.DeleteAsync(rental.Id);
+        var deleted = await _repository.GetByIdAsync(rental.Id);
+
+        // Assert
+        Assert.Null(deleted);
     }
 }

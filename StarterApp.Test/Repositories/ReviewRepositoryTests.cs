@@ -153,4 +153,90 @@ public class ReviewRepositoryTests : IDisposable
         // Assert
         Assert.False(hasReviewed);
     }
+
+    [Fact]
+    public async Task GetAllAsync_ShouldReturnAllReviews()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync();
+        await _repository.CreateAsync(new Review { RentalId = rental.Id, ReviewerId = 2, Rating = 4, Comment = "Good condition" });
+
+        // Act
+        var reviews = await _repository.GetAllAsync();
+
+        // Assert
+        Assert.NotEmpty(reviews);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnCorrectReview()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync();
+        var review = await _repository.CreateAsync(new Review { RentalId = rental.Id, ReviewerId = 2, Rating = 3, Comment = "It was OK" });
+
+        // Act
+        var found = await _repository.GetByIdAsync(review.Id);
+
+        // Assert
+        Assert.NotNull(found);
+        Assert.Equal(review.Id, found.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenReviewDoesNotExist()
+    {
+        // Act
+        var found = await _repository.GetByIdAsync(999999);
+
+        // Assert
+        Assert.Null(found);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldSaveChanges()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync();
+        var review = await _repository.CreateAsync(new Review { RentalId = rental.Id, ReviewerId = 2, Rating = 3, Comment = "OK" });
+        review.Rating = 5;
+        review.Comment = "Changed my mind - amazing!";
+
+        // Act
+        var updated = await _repository.UpdateAsync(review);
+
+        // Assert
+        Assert.Equal(5, updated.Rating);
+        Assert.Equal("Changed my mind - amazing!", updated.Comment);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldRemoveReview()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync();
+        var review = await _repository.CreateAsync(new Review { RentalId = rental.Id, ReviewerId = 2, Rating = 4, Comment = "Nice" });
+
+        // Act
+        await _repository.DeleteAsync(review.Id);
+        var deleted = await _repository.GetByIdAsync(review.Id);
+
+        // Assert
+        Assert.Null(deleted);
+    }
+
+    [Fact]
+    public async Task GetByReviewerAsync_ShouldReturnReviewsByThatUser()
+    {
+        // Arrange
+        var rental = await CreateTestRentalAsync();
+        await _repository.CreateAsync(new Review { RentalId = rental.Id, ReviewerId = 2, Rating = 5, Comment = "Fantastic!" });
+
+        // Act
+        var reviews = await _repository.GetByReviewerAsync(2);
+
+        // Assert
+        Assert.NotEmpty(reviews);
+        Assert.All(reviews, r => Assert.Equal(2, r.ReviewerId));
+    }
 }

@@ -1,3 +1,7 @@
+// I refactored this file in two steps: first I added // Arrange, // Act, // Assert labels to all
+// 6 original tests so each step is clearly separated and easier to read. Then I added 5 new tests
+// to cover methods that had no tests at all (UpdateAsync, DeleteAsync, GetByCategoryAsync, SearchNearbyAsync),
+// bringing the total from 6 to 11 and closing the main coverage gaps.
 
 using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
@@ -20,21 +24,37 @@ public class ItemRepositoryTests : IDisposable
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllAvailableItems()
     {
+        // Arrange - seed data loaded by DatabaseFixture
+
+        // Act
         var items = await _repository.GetAllAsync();
+
+        // Assert
         Assert.NotEmpty(items);
     }
 
     [Fact]
     public async Task GetAllAsync_ShouldOnlyReturnAvailableItems()
     {
+        // Arrange - seed data loaded by DatabaseFixture
+
+        // Act
         var items = await _repository.GetAllAsync();
+
+        // Assert
         Assert.All(items, item => Assert.True(item.IsAvailable));
     }
 
     [Fact]
     public async Task GetByIdAsync_ShouldReturnCorrectItem()
     {
-        var item = await _repository.GetByIdAsync(1);
+        // Arrange
+        var targetId = 1;
+
+        // Act
+        var item = await _repository.GetByIdAsync(targetId);
+
+        // Assert
         Assert.NotNull(item);
         Assert.Equal("Wooden Big Hammer from China", item.Title);
     }
@@ -42,13 +62,20 @@ public class ItemRepositoryTests : IDisposable
     [Fact]
     public async Task GetByIdAsync_ShouldReturnNull_WhenItemDoesNotExist()
     {
-        var item = await _repository.GetByIdAsync(555111);
+        // Arrange
+        var nonExistentId = 555111;
+
+        // Act
+        var item = await _repository.GetByIdAsync(nonExistentId);
+
+        // Assert
         Assert.Null(item);
     }
 
     [Fact]
     public async Task CreateAsync_ShouldSaveNewItem()
     {
+        // Arrange
         var newItem = new Item
         {
             Title = "Wooden Box from the 18th Century",
@@ -58,7 +85,10 @@ public class ItemRepositoryTests : IDisposable
             IsAvailable = true
         };
 
+        // Act
         var savedItem = await _repository.CreateAsync(newItem);
+
+        // Assert
         Assert.True(savedItem.Id > 0);
         Assert.Equal("Wooden Box from the 18th Century", savedItem.Title);
     }
@@ -66,8 +96,95 @@ public class ItemRepositoryTests : IDisposable
     [Fact]
     public async Task GetByOwnerAsync_ShouldReturnItemsForThatOwner()
     {
-        var items = await _repository.GetByOwnerAsync(1);
+        // Arrange
+        var ownerId = 1;
+
+        // Act
+        var items = await _repository.GetByOwnerAsync(ownerId);
+
+        // Assert
         Assert.NotEmpty(items);
-        Assert.All(items, item => Assert.Equal(1, item.OwnerId));
+        Assert.All(items, item => Assert.Equal(ownerId, item.OwnerId));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldSaveChanges()
+    {
+        // Arrange
+        var item = await _repository.GetByIdAsync(1);
+        item!.Title = "Updated Hammer";
+        item.DailyRate = 8.00m;
+
+        // Act
+        var updated = await _repository.UpdateAsync(item);
+
+        // Assert
+        Assert.Equal("Updated Hammer", updated.Title);
+        Assert.Equal(8.00m, updated.DailyRate);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldRemoveItem()
+    {
+        // Arrange - create a disposable item so seed data stays intact
+        var item = await _repository.CreateAsync(new Item
+        {
+            Title = "Item To Delete",
+            DailyRate = 1.00m,
+            CategoryId = 1,
+            OwnerId = 1,
+            IsAvailable = true
+        });
+
+        // Act
+        await _repository.DeleteAsync(item.Id);
+        var deleted = await _repository.GetByIdAsync(item.Id);
+
+        // Assert
+        Assert.Null(deleted);
+    }
+
+    [Fact]
+    public async Task GetByCategoryAsync_ShouldReturnOnlyItemsInThatCategory()
+    {
+        // Arrange
+        var categoryId = 1;
+
+        // Act
+        var items = await _repository.GetByCategoryAsync(categoryId);
+
+        // Assert
+        Assert.NotEmpty(items);
+        Assert.All(items, i => Assert.Equal(categoryId, i.CategoryId));
+    }
+
+    [Fact]
+    public async Task SearchNearbyAsync_ShouldReturnItemsWithinRadius()
+    {
+        // Arrange - Edinburgh city centre, both seed items are close by
+        var latitude = 55.9533;
+        var longitude = -3.1883;
+        var radiusKm = 10;
+
+        // Act
+        var items = await _repository.SearchNearbyAsync(latitude, longitude, radiusKm);
+
+        // Assert
+        Assert.NotEmpty(items);
+    }
+
+    [Fact]
+    public async Task SearchNearbyAsync_ShouldNotReturnItemsOutsideRadius()
+    {
+        // Arrange - London is over 500km from the Edinburgh seed items
+        var latitude = 51.5074;
+        var longitude = -0.1278;
+        var radiusKm = 1;
+
+        // Act
+        var items = await _repository.SearchNearbyAsync(latitude, longitude, radiusKm);
+
+        // Assert
+        Assert.Empty(items);
     }
 }

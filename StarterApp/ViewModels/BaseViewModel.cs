@@ -3,6 +3,8 @@
 /// @author StarterApp Development Team
 /// @date 2025
 
+// CommunityToolkit.Mvvm (.NET Foundation, 2024) - provides ObservableObject, [ObservableProperty], and [RelayCommand]
+// used across all ViewModels in the project to implement the MVVM pattern without boilerplate code
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 

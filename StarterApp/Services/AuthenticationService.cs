@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StarterApp.Database.Data;
 using StarterApp.Database.Models;
+// BCrypt.Net-Next (Compuware, 2024) - used to hash and verify passwords securely in local database mode
 using BCrypt.Net;
 
 namespace StarterApp.Services;

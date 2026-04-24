@@ -1,3 +1,5 @@
+// Microsoft.Maui.Controls (Microsoft, 2024) - the cross-platform UI framework that powers the entire app
+// it provides the Views, navigation, data binding, and platform-specific rendering for Android and Windows
 // this is the entry point for the whole app's setup.
 // everything gets registered here - services, viewmodels, pages.
 // the useSharedApi flag at the top controls whether we talk to the
