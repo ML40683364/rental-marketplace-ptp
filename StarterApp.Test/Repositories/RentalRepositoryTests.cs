@@ -1,6 +1,8 @@
-// This file originally had 5 tests that each wrote out a full Rental object inline every time.
-// I refactored it by extracting a CreateTestRentalAsync helper so the shared setup lives in one place,
-// and added 7 new tests to cover methods that had no coverage — bringing the total from 5 to 12.
+// Claude generated a single [Fact] for UpdateStatusAsync that only tested Requested → Approved,
+// which passed but left four other valid transitions completely untested.
+// I caught this by checking my own Rental.cs model and the coursework requirement to use [Theory]
+// for parameterised tests, then replaced the single [Fact] with a [Theory] and five [InlineData]
+// entries covering every transition — one method that runs five times instead of five separate tests.
 
 using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
@@ -116,13 +118,14 @@ public class RentalRepositoryTests : IDisposable
     [Fact]
     public async Task IsItemAvailableAsync_ShouldReturnFalse_WhenDatesOverlap()
     {
-        // Arrange - create an approved rental for item 2 (Pink Camping Mattress)
+        // Arrange - create an approved rental for Pink Camping Mattress (Id 2) on days 10-12
+        // seed data has zero rentals so this is the only rental in the database
         await CreateTestRentalAsync(status: "Approved", daysOffset: 10, itemId: 2);
 
-        // Act - try to book the same item on overlapping dates
+        // Act - try to book the exact same item on the exact same dates
         var available = await _repository.IsItemAvailableAsync(2, DateTime.Today.AddDays(10), DateTime.Today.AddDays(12));
 
-        // Assert
+        // Assert - must return false, the item is already booked on those dates
         Assert.False(available);
     }
 

@@ -1,7 +1,10 @@
-// I refactored this file in two steps: first I added // Arrange, // Act, // Assert labels to all
-// 6 original tests so each step is clearly separated and easier to read. Then I added 5 new tests
-// to cover methods that had no tests at all (UpdateAsync, DeleteAsync, GetByCategoryAsync, SearchNearbyAsync),
-// bringing the total from 6 to 11 and closing the main coverage gaps.
+// ChatGPT generated the initial 6 tests using IClassFixture<DatabaseFixture>, which shares one
+// database instance across all tests — I caught this by reading the module notes on determinism,
+// which state that tests must produce the same result every time regardless of execution order.
+// The AI also repeated var repository = new ItemRepository(_fakeDb.Context) inside every single
+// test, so I moved it to a private field in the constructor to fix the DRY violation.
+// I replaced IClassFixture with a plain new DatabaseFixture() in the constructor so xUnit creates
+// a fresh database for each test, making all 6 tests properly isolated and reliable.
 
 using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
@@ -48,13 +51,13 @@ public class ItemRepositoryTests : IDisposable
     [Fact]
     public async Task GetByIdAsync_ShouldReturnCorrectItem()
     {
-        // Arrange
+        // Arrange - DatabaseFixture seeded "Wooden Big Hammer from China" with Id 1
         var targetId = 1;
 
-        // Act
+        // Act - call the real method being tested
         var item = await _repository.GetByIdAsync(targetId);
 
-        // Assert
+        // Assert - item must exist and must be the correct one, not just any item
         Assert.NotNull(item);
         Assert.Equal("Wooden Big Hammer from China", item.Title);
     }
@@ -62,13 +65,13 @@ public class ItemRepositoryTests : IDisposable
     [Fact]
     public async Task GetByIdAsync_ShouldReturnNull_WhenItemDoesNotExist()
     {
-        // Arrange
+        // Arrange - 555111 does not exist in the seed data
         var nonExistentId = 555111;
 
         // Act
         var item = await _repository.GetByIdAsync(nonExistentId);
 
-        // Assert
+        // Assert - nothing should be found
         Assert.Null(item);
     }
 

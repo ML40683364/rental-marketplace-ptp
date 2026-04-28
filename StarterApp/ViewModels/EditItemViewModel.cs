@@ -59,6 +59,8 @@ public partial class EditItemViewModel : BaseViewModel
         ClearError();
         try
         {
+            // This line calls an asynchronous service method to update an item’s details (ID, title, description, and price). 
+            // Passing false for isAvailable marks the item as unavailable instead of deleting it, which is known as a soft delete.
             await _rentalService.UpdateItemAsync(ItemId, ItemTitle, ItemDescription, dailyRate, IsAvailable);
             await _navigationService.NavigateBackAsync();
         }
@@ -75,33 +77,12 @@ public partial class EditItemViewModel : BaseViewModel
     [RelayCommand]
     private async Task DeleteAsync()
     {
-
-
-
-        //  soft delete button logic
-
-
-
-        // Instead of permanently removing the item from the database, the item is simply updated by setting 
-        // IsAvailable = false. This means the data still exists in the system, but it is hidden from users 
-        // because the “Browse Items” page only displays items where IsAvailable = true.
-
-
-
-        // I originally tried to call DELETE /items/{id} on the API but kept getting 404.
-        // After checking the Swagger docs carefully I realised the API has no DELETE endpoint at all.
-        // The only way to "remove" an item is to set IsAvailable = false using PUT /items/{id}.
-        // This is actually called a "soft delete" - the item stays in the database but
-        // disappears from Browse Items because the API only returns IsAvailable = true items.
-        //
-        // I thought this was strange at first but then I learned this is how most real apps work.
-        // Think about Facebook - when you delete a post it does not actually disappear from their
-        // servers. Or when you cancel an Amazon order - the record stays for accounting and disputes.
-        // Nothing truly disappears from the internet. Data is just hidden, not destroyed.
-        //
-        // For this app it also makes sense because if we hard-deleted an item, all the rentals
-        // and reviews linked to it would become orphaned records pointing to nothing.
-        // Soft delete avoids that problem entirely.
+        // My first attempt was to call DELETE /items/{id} on the API, which Claude suggested,
+        // but every call came back with a 404 error. After checking the Swagger docs I realised
+        // the API has no DELETE endpoint at all - removing a record would orphan every rental and
+        // review that references it, leaving broken foreign keys in the database. The solution was
+        // to use PUT /items/{id} with isAvailable = false, which hides the item from Browse Items
+        // without touching the underlying record or any of its linked data.
 
         bool confirmed = await Shell.Current.DisplayAlert(
             "Remove Item",

@@ -17,8 +17,10 @@ public class ApiService : IApiService
         _httpClient = httpClient;
     }
 
-    // replaces the repeated if (!response.IsSuccessStatusCode) blocks with one
-    // private helper that distinguishes between different HTTP error codes
+    // Claude generated ApiService with the same if (!response.IsSuccessStatusCode) block copied
+    // into all 7 methods, which was a DRY violation — one change would need updating in 7 places.
+    // The API docs (section 5) recommended a switch statement to handle 400, 401, 403, 404, and 409
+    // separately, so I extracted this helper and replaced all 7 repeated blocks with a single call.
     private async Task HandleErrorResponse(HttpResponseMessage response)
     {
         var error = await response.Content.ReadFromJsonAsync<ApiErrorResponse>();
