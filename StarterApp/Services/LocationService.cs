@@ -2,6 +2,11 @@ namespace StarterApp.Services;
 
 public class LocationService : ILocationService
 {
+    // Previously 55.9533 and -3.1883 were hardcoded separately in NearbyItemsViewModel and CreateItemViewModel.
+    // Defined once here so both ViewModels reference the same value and only one place needs updating if it ever changes.
+    public const double DefaultLatitude = 55.9533;
+    public const double DefaultLongitude = -3.1883;
+
     // Asks the device for current GPS position
     public async Task<(double Latitude, double Longitude)?> GetCurrentLocationAsync()
     {

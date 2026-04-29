@@ -46,32 +46,18 @@ public partial class ItemDetailViewModel : BaseViewModel
     partial void OnItemIdChanged(int value) => _ = LoadItemAsync();
 
     [RelayCommand]
-    private async Task LoadItemAsync()
+    private async Task LoadItemAsync() => await RunWithLoadingAndErrorHandlingAsync(async () =>
     {
-        if (IsBusy) return;
-        IsBusy = true;
-        ClearError();
-        try
+        Item = await _rentalService.GetItemByIdAsync(ItemId);
+        if (Item != null)
         {
-            Item = await _rentalService.GetItemByIdAsync(ItemId);
-            if (Item != null)
-            {
-                Title = Item.Title;
-                IsOwner = _authService.CurrentUser?.Id == Item.OwnerId;
-                var reviewList = await _rentalService.GetReviewsForItemAsync(ItemId);
-                Reviews = new ObservableCollection<Review>(reviewList);
-                AverageRating = await _rentalService.GetAverageRatingAsync(ItemId);
-            }
+            Title = Item.Title;
+            IsOwner = _authService.CurrentUser?.Id == Item.OwnerId;
+            var reviewList = await _rentalService.GetReviewsForItemAsync(ItemId);
+            Reviews = new ObservableCollection<Review>(reviewList);
+            AverageRating = await _rentalService.GetAverageRatingAsync(ItemId);
         }
-        catch (Exception ex)
-        {
-            SetError($"Failed to load item: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+    }, "Failed to load item");
 
     [RelayCommand]
     private async Task EditItemAsync()
@@ -98,20 +84,10 @@ public partial class ItemDetailViewModel : BaseViewModel
     private async Task RequestRentalAsync()
     {
         if (_authService.CurrentUser == null) return;
-        IsBusy = true;
-        ClearError();
-        try
+        await RunWithLoadingAndErrorHandlingAsync(async () =>
         {
             await _rentalService.RequestRentalAsync(ItemId, _authService.CurrentUser.Id, StartDate, EndDate);
             await _navigationService.NavigateToAsync("RentalsPage");
-        }
-        catch (Exception ex)
-        {
-            SetError(ex.Message);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        });
     }
 }

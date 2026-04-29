@@ -111,11 +111,15 @@ public class ApiService : IApiService
         return (items, totalPages);
     }
 
-    // uses PostGIS on the server side - we just send coordinates and a radius
+    // Uses PostGIS on the server side - just send coordinates and a radius.
+    // Previously the category was added to the URL as a raw string, which would break if a category
+    // name contained a space or special character (e.g. "computer games" would confuse the server).
+    // Added Uri.EscapeDataString() to match how GetItemsAsync already handles the category parameter,
+    // so a space becomes %20 and the API always receives a valid, readable URL.
     public async Task<List<Item>> GetNearbyItemsAsync(double lat, double lon, double radius = 5.0, string category = null)
     {
         var query = $"items/nearby?lat={lat}&lon={lon}&radius={radius}";
-        if (!string.IsNullOrEmpty(category)) query += $"&category={category}";
+        if (!string.IsNullOrEmpty(category)) query += $"&category={Uri.EscapeDataString(category)}";
 
         var response = await _httpClient.GetAsync(query);
         response.EnsureSuccessStatusCode();

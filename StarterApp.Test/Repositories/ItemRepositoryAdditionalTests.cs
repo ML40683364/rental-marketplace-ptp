@@ -1,19 +1,19 @@
-// This file originally had 4 tests but 2 of them were near-identical duplicates of tests already
-// in ItemRepositoryTests.cs, which is a DRY violation at the suite level.
-// I removed the duplicates and kept only the 2 tests that are specific to this class.
+// These two tests were previously in ViewModels/ItemsListViewModelTests.cs which was the wrong
+// folder and wrong name — they test ItemRepository not ItemsListViewModel.
+// Moved here into the Repositories folder and renamed so the test project structure is accurate.
 
 using StarterApp.Database.Data.Repositories;
 using StarterApp.Database.Models;
 using StarterApp.Test.Fixtures;
 
-namespace StarterApp.Test.ViewModels;
+namespace StarterApp.Test.Repositories;
 
-public class ItemsListViewModelTests : IDisposable
+public class ItemRepositoryAdditionalTests : IDisposable
 {
     private readonly DatabaseFixture _fakeDb;
     private readonly ItemRepository _repository;
 
-    public ItemsListViewModelTests()
+    public ItemRepositoryAdditionalTests()
     {
         _fakeDb = new DatabaseFixture();
         _repository = new ItemRepository(_fakeDb.Context);

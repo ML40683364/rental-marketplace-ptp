@@ -47,25 +47,13 @@ public partial class ReviewsViewModel : BaseViewModel
     private async Task SubmitReviewAsync()
     {
         if (_authService.CurrentUser == null) return;
-        IsBusy = true;
-        ClearError();
-        try
+        await RunWithLoadingAndErrorHandlingAsync(async () =>
         {
             // cast to int because the API expects integer rating 1-5, slider gives a double
             await _rentalService.SubmitReviewAsync(RentalId, _authService.CurrentUser.Id, (int)SelectedRating, Comment);
-
-            // reset the form and go back to the rentals page
             Comment = string.Empty;
             SelectedRating = 5;
             await _navigationService.NavigateBackAsync();
-        }
-        catch (Exception ex)
-        {
-            SetError(ex.Message);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        });
     }
 }

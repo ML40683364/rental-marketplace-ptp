@@ -12,7 +12,7 @@ public partial class CreateItemViewModel : BaseViewModel
     private readonly IAuthenticationService _authService;
     private readonly INavigationService _navigationService;
 
-    // beeing caaled by CreateItemViewModel and NearbyItemsViewModel to get the GPS coordinates from the phone
+    // used by CreateItemViewModel and NearbyItemsViewModel to get the GPS coordinates from the phone
     private readonly ILocationService _locationService;
     private readonly IApiService _apiService;
 
@@ -37,10 +37,9 @@ public partial class CreateItemViewModel : BaseViewModel
     [ObservableProperty]
     private Category selectedCategory;
 
-    // default to Edinburgh — makes sense since that's where the uni is
-    // user can override by tapping Get My Location if they want
-    private double? _latitude = 55.9533;
-    private double? _longitude = -3.1883;
+    // default to Edinburgh using the shared constant from LocationService
+    private double? _latitude = LocationService.DefaultLatitude;
+    private double? _longitude = LocationService.DefaultLongitude;
 
     public CreateItemViewModel(IRentalService rentalService, IAuthenticationService authService,
         INavigationService navigationService, ILocationService locationService, IApiService apiService)
@@ -95,7 +94,7 @@ public partial class CreateItemViewModel : BaseViewModel
 
     [RelayCommand]
 
-    // importent!!! - When the user taps "Save Item" this runs.
+    // When the user taps "Save Item" this runs.
     // checks - is the user logged in? Is the title empty? Is the daily rate a valid number? Has the user got a location? Has the user selected a category?.....
     private async Task SaveAsync()
     {
@@ -125,13 +124,8 @@ public partial class CreateItemViewModel : BaseViewModel
             return;
         }
 
-        IsBusy = true;
-        ClearError();
-        try
+        await RunWithLoadingAndErrorHandlingAsync(async () =>
         {
-
-            // after validation passes, it builds the item: 
-            // It takes everything the user typed and packages it into an Item object.
             var item = new Item
             {
                 Title = ItemTitle,
@@ -143,20 +137,9 @@ public partial class CreateItemViewModel : BaseViewModel
                 OwnerId = _authService.CurrentUser.Id,
                 IsAvailable = true
             };
-
-
-            //  Takes the user back to the previous screen.
             await _rentalService.CreateItemAsync(item);
             await _navigationService.NavigateBackAsync();
-        }
-        catch (Exception ex)
-        {
-            SetError($"Failed to create item: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        }, "Failed to create item");
     }
 
     [RelayCommand]

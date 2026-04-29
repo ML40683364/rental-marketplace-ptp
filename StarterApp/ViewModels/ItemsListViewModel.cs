@@ -64,34 +64,14 @@ public partial class ItemsListViewModel : BaseViewModel
     // it fetches items from the API, fills the list
     // i updated this to also pass the search text, selected category and page number to the API
     // the API handles the actual filtering - i just send the values as query parameters
-    private async Task LoadItemsAsync()
+    private async Task LoadItemsAsync() => await RunWithLoadingAndErrorHandlingAsync(async () =>
     {
-        if (IsBusy) return;
-        IsBusy = true;
-        ClearError();
-        try
-        {
-            // grab the category slug (e.g. "tools") or null if nothing selected / "All" selected
-            var categorySlug = SelectedCategory?.Id == 0 ? null : SelectedCategory?.Slug;
-
-            // dont send empty string to the API, send null instead so the filter is ignored
-            var search = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim();
-
-            var result = await _rentalService.GetAvailableItemsAsync(categorySlug, search, CurrentPage);
-            Items = new ObservableCollection<Item>(result.Items);
-
-            // update pagination state - this automatically updates the buttons via NotifyPropertyChangedFor
-            TotalPages = result.TotalPages == 0 ? 1 : result.TotalPages;
-        }
-        catch (Exception ex)
-        {
-            SetError($"Failed to load items: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
+        var categorySlug = SelectedCategory?.Id == 0 ? null : SelectedCategory?.Slug;
+        var search = string.IsNullOrWhiteSpace(SearchText) ? null : SearchText.Trim();
+        var result = await _rentalService.GetAvailableItemsAsync(categorySlug, search, CurrentPage);
+        Items = new ObservableCollection<Item>(result.Items);
+        TotalPages = result.TotalPages == 0 ? 1 : result.TotalPages;
+    }, "Failed to load items");
 
     // i added this to load the category list from the API when the page opens
     // the categories go into a Picker in the XAML so the user can filter by category

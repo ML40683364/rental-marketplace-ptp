@@ -12,13 +12,12 @@ public partial class LoginPage : ContentPage
         BindingContext = viewModel;     // connects the UI to the ViewModel so bindings work
     }
 
-    // runs every time this page appears on screen
-    // NOTE: pre-fills credentials for development/testing — remove before releasing the app
+    // Previously this method pre-filled the form with admin@company.com and Admin123! as a dev shortcut.
+    // Removed hardcoded test credentials because leaving them in would mean any user opening the app
+    // would see someone else's email and password pre-filled, which is a security risk and looks unprofessional.
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        EmailEntry.Focus();                         // puts the cursor in the email field
-        EmailEntry.Text = "admin@company.com";      // dev shortcut — pre-filled test email
-        PasswordEntry.Text = "Admin123!";           // dev shortcut — pre-filled test password
+        EmailEntry.Focus();
     }
 }

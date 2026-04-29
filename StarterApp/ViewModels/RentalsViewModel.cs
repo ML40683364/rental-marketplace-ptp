@@ -31,24 +31,14 @@ public partial class RentalsViewModel : BaseViewModel
     private async Task LoadRentalsAsync()
     {
         if (_authService.CurrentUser == null) return;
-        IsBusy = true;
-        ClearError();
-        try
+        await RunWithLoadingAndErrorHandlingAsync(async () =>
         {
             var mine = await _rentalService.GetMyRentalsAsync(_authService.CurrentUser.Id);
             MyRentals = new ObservableCollection<Rental>(mine);
 
             var onMyItems = await _rentalService.GetRentalsForMyItemsAsync(_authService.CurrentUser.Id);
             RentalsOnMyItems = new ObservableCollection<Rental>(onMyItems);
-        }
-        catch (Exception ex)
-        {
-            SetError($"Failed to load rentals: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        }, "Failed to load rentals");
     }
 
     [RelayCommand]

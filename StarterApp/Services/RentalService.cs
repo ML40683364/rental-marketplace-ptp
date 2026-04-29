@@ -98,8 +98,11 @@ public class RentalService : IRentalService
     public Task<Rental> MarkAsReturnedAsync(int rentalId)
         => _rentals.UpdateStatusAsync(rentalId, "Returned");
 
+    // Must be Completed: was calling "Returned" instead of "Completed", which meant the rental workflow
+    // would get stuck and the borrower could never see the Leave Review button in local DB mode.
+    //only valid for the local DB version - API version has more complex workflow and this method is not used.
     public Task<Rental> CompleteRentalAsync(int rentalId)
-        => _rentals.UpdateStatusAsync(rentalId, "Returned");
+        => _rentals.UpdateStatusAsync(rentalId, "Completed");
 
     public Task<List<Rental>> GetMyRentalsAsync(int renterId)
         => _rentals.GetByRenterAsync(renterId);

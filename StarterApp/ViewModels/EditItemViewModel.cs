@@ -55,23 +55,11 @@ public partial class EditItemViewModel : BaseViewModel
             return;
         }
 
-        IsBusy = true;
-        ClearError();
-        try
+        await RunWithLoadingAndErrorHandlingAsync(async () =>
         {
-            // This line calls an asynchronous service method to update an item’s details (ID, title, description, and price). 
-            // Passing false for isAvailable marks the item as unavailable instead of deleting it, which is known as a soft delete.
             await _rentalService.UpdateItemAsync(ItemId, ItemTitle, ItemDescription, dailyRate, IsAvailable);
             await _navigationService.NavigateBackAsync();
-        }
-        catch (Exception ex)
-        {
-            SetError($"Failed to update item: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        }, "Failed to update item");
     }
 
     [RelayCommand]
@@ -92,33 +80,16 @@ public partial class EditItemViewModel : BaseViewModel
 
         if (!confirmed) return;
 
-        IsBusy = true;
-        ClearError();
-        try
+        await RunWithLoadingAndErrorHandlingAsync(async () =>
         {
-            // I reuse UpdateItemAsync here instead of DeleteItemAsync because the API
-            // has no DELETE endpoint - PUT /items/{id} with isAvailable = false is
-            // the only way to hide an item from the marketplace.
-            // The item disappears from Browse Items immediately after this call
-            // because GET /items only returns items where isAvailable = true.
+            // PUT /items/{id} with isAvailable = false is the only way to hide an item -
+            // the API has no DELETE endpoint so this is a soft delete.
+            // Go back twice: EditItemPage → ItemDetailPage → ItemsListPage.
             await _rentalService.UpdateItemAsync(ItemId, ItemTitle, ItemDescription,
-                decimal.Parse(DailyRateText), false); // set IsAvailable = false to "soft delete" the item
-
-            // I tried GoToAsync("//ItemsListPage") but got an absolute routing error.
-            // PopToRootAsync() went too far and logged the user out.
-            // The correct fix is to go back twice — first from EditItemPage to ItemDetailPage,
-            // then from ItemDetailPage back to ItemsListPage.
+                decimal.Parse(DailyRateText), false);
             await _navigationService.NavigateBackAsync();
             await _navigationService.NavigateBackAsync();
-        }
-        catch (Exception ex)
-        {
-            SetError($"Failed to remove item: {ex.Message}");
-        }
-        finally
-        {
-            IsBusy = false;
-        }
+        }, "Failed to remove item");
     }
 
     [RelayCommand]

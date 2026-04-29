@@ -60,4 +60,28 @@ public partial class BaseViewModel : ObservableObject
     {
         ClearError();
     }
+
+    // Before this method existed, every command in every ViewModel repeated the same 10-line block:
+    // IsBusy = true, ClearError, try/catch with SetError, finally IsBusy = false.
+    // That block appeared 9 times across 6 files — a DRY violation meaning any change needed updating in 9 places.
+    // Now each command passes only its unique work here and the loading spinner, error handling,
+    // and cleanup are managed automatically in one single place.
+    protected async Task RunWithLoadingAndErrorHandlingAsync(Func<Task> action, string errorPrefix = "")
+    {
+        if (IsBusy) return;
+        IsBusy = true;
+        ClearError();
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            SetError(string.IsNullOrEmpty(errorPrefix) ? ex.Message : $"{errorPrefix}: {ex.Message}");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }
