@@ -63,11 +63,9 @@ No real database needed - tests use an in-memory database.
 
 ```bash
 dotnet test
-dotnet test --filter "ItemRepositoryTests"          # one class
-dotnet test --filter "GetAllAsync_ShouldReturnItems"  # one test
 ```
 
-Expected: `total: 26, failed: 0, succeeded: 26`
+Expected Test summary: total: 50, failed: 0, succeeded: 50, skipped: 0,
 
 ---
 
@@ -96,7 +94,7 @@ MVVM pattern: `Model (data) → ViewModel (logic) → View (UI)`
 
 ## CI/CD
 
-GitHub Actions runs on every push - builds, runs all 26 tests against a real PostgreSQL container, sends coverage to SonarCloud (42.3%) and generates Doxygen docs as a downloadable artifact.
+GitHub Actions runs on every push - builds, runs all 50 tests against a real PostgreSQL container, sends coverage to SonarCloud (62%) and generates Doxygen docs as a downloadable artifact.
 
 Pipeline and Doxygen artifact: https://github.com/ML40683364/rental-marketplace-ptp/actions
 

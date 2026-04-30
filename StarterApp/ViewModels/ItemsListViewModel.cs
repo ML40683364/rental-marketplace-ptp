@@ -1,3 +1,6 @@
+// Handles the logic for the items list screen — loads all available items from the API,
+// holds the list the UI binds to, and navigates to item detail when one is selected.
+
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

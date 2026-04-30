@@ -110,6 +110,14 @@ public partial class LoginViewModel : BaseViewModel
         await _navigationService.NavigateToAsync("RegisterPage");
     }
 
+    /// @brief Clears all form fields and error state — called each time the page appears
+    public void ResetForm()
+    {
+        Email = string.Empty;
+        Password = string.Empty;
+        ClearError();
+    }
+
     /// @brief Handles forgot password functionality
     /// @details Relay command that displays a placeholder message for forgot password
     /// @return A task representing the asynchronous operation

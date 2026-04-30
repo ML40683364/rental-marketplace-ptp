@@ -118,6 +118,18 @@ public partial class RegisterViewModel : BaseViewModel
         await _navigationService.NavigateBackAsync();
     }
 
+    /// @brief Clears all form fields and error state — called each time the page appears
+    public void ResetForm()
+    {
+        FirstName = string.Empty;
+        LastName = string.Empty;
+        Email = string.Empty;
+        Password = string.Empty;
+        ConfirmPassword = string.Empty;
+        AcceptTerms = false;
+        ClearError();
+    }
+
     /// @brief Validates the registration form data
     /// @return True if validation passes, false otherwise
     /// @details Checks all registration requirements and sets appropriate error messages

@@ -1,12 +1,15 @@
+//  It tests that the RentalRepository can correctly create, read, update, delete, and filter rentals in the database — 
+//  including double-booking prevention and status transitions.
+
 // Claude generated a single [Fact] for UpdateStatusAsync that only tested Requested → Approved,
 // which passed but left four other valid transitions completely untested.
 // I caught this by checking my own Rental.cs model and the coursework requirement to use [Theory]
 // for parameterised tests, then replaced the single [Fact] with a [Theory] and five [InlineData]
 // entries covering every transition — one method that runs five times instead of five separate tests.
 
-using StarterApp.Database.Data.Repositories;
-using StarterApp.Database.Models;
-using StarterApp.Test.Fixtures;
+using StarterApp.Database.Data.Repositories; // gives access to RentalRepository, the class being tested 
+using StarterApp.Database.Models; // gives access to the Rental model so tests can create rental objects 
+using StarterApp.Test.Fixtures; //  gives access to DatabaseFixture, the fake in-memory database 
 
 namespace StarterApp.Test.Repositories;
 
