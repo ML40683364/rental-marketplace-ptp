@@ -31,7 +31,7 @@
 
             <!-- App Logo/Title -->
             <Label Grid.Row="0"
-                   Text="StarterApp"
+                   Text="RentalApp"
                    FontSize="32"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
