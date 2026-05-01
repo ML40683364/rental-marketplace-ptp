@@ -94,7 +94,7 @@ MVVM pattern: `Model (data) → ViewModel (logic) → View (UI)`
 
 ## CI/CD
 
-GitHub Actions runs on every push - builds, runs all 50 tests against a real PostgreSQL container, sends coverage to SonarCloud (62%) and generates Doxygen docs as a downloadable artifact.
+GitHub Actions runs on every push - builds, runs all 50 tests against a real PostgreSQL container, sends coverage to SonarCloud (65.1%) and generates Doxygen docs as a downloadable artifact.
 
 Pipeline and Doxygen artifact: https://github.com/ML40683364/rental-marketplace-ptp/actions
 

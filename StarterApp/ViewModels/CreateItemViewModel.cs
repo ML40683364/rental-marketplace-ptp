@@ -32,6 +32,9 @@ public partial class CreateItemViewModel : BaseViewModel
     private string locationText = "Default: Edinburgh (55.9533, -3.1883)";
 
     [ObservableProperty]
+    private Color locationTextColor = Color.FromArgb("#555555");
+
+    [ObservableProperty]
     private ObservableCollection<Category> categories = new();
 
     [ObservableProperty]
@@ -78,7 +81,11 @@ public partial class CreateItemViewModel : BaseViewModel
             var location = await _locationService.GetCurrentLocationAsync();
             if (location == null)
             {
-                SetError("Could not get location. Please enable location permissions.");
+                _latitude = LocationService.DefaultLatitude;
+                _longitude = LocationService.DefaultLongitude;
+                LocationText = "⚠ GPS unavailable  defaulting to Edinburgh (55.9533, -3.1883)";
+                LocationTextColor = Color.FromArgb("#FF9800");
+                ClearError();
                 return;
             }
             _latitude = location.Value.Latitude;

@@ -85,8 +85,9 @@ public partial class EditItemViewModel : BaseViewModel
             // PUT /items/{id} with isAvailable = false is the only way to hide an item -
             // the API has no DELETE endpoint so this is a soft delete.
             // Go back twice: EditItemPage → ItemDetailPage → ItemsListPage.
+            decimal.TryParse(DailyRateText, out var rate);
             await _rentalService.UpdateItemAsync(ItemId, ItemTitle, ItemDescription,
-                decimal.Parse(DailyRateText), false);
+                rate, false);
             await _navigationService.NavigateBackAsync();
             await _navigationService.NavigateBackAsync();
         }, "Failed to remove item");

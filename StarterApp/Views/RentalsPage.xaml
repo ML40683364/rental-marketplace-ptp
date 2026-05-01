@@ -29,9 +29,9 @@
                                 <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
                                 <StackLayout Spacing="4">
                                     <Label Text="{Binding ItemTitle}" FontSize="16" FontAttributes="Bold"/>
-                                    <!-- Status e.g. Requested / Approved / Rejected / Completed -->
-                                    <Label Text="{Binding Status}" FontSize="13"
-                                           TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                                    <!-- Status colour is set by StatusToColorConverter so each state is visually distinct -->
+                                    <Label Text="{Binding Status}" FontSize="13" FontAttributes="Bold"
+                                           TextColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
                                     <Label Text="{Binding StartDate, StringFormat='From: {0:dd MMM yyyy}'}" FontSize="12"/>
                                     <Label Text="{Binding EndDate, StringFormat='To: {0:dd MMM yyyy}'}" FontSize="12"/>
                                     <Label Text="{Binding TotalPrice, StringFormat='Total: £{0:F2}'}"
@@ -74,8 +74,9 @@
                                 <StackLayout Spacing="6">
                                     <Label Text="{Binding ItemTitle}" FontSize="16" FontAttributes="Bold"/>
                                     <Label Text="{Binding BorrowerName, StringFormat='Requested by: {0}'}" FontSize="13"/>
-                                    <Label Text="{Binding Status}" FontSize="13"
-                                           TextColor="{AppThemeBinding Light=#512BD4, Dark=#ac99ea}"/>
+                                    <!-- Status colour is set by StatusToColorConverter so each state is visually distinct -->
+                                    <Label Text="{Binding Status}" FontSize="13" FontAttributes="Bold"
+                                           TextColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
                                     <!-- Approve + Reject: shown when Requested -->
                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8"
                                           IsVisible="{Binding Status, Converter={StaticResource StringToBoolConverter}, ConverterParameter=Requested}">

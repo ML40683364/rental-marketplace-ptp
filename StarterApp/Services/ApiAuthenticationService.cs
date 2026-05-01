@@ -15,10 +15,12 @@ public class ApiAuthenticationService : IAuthenticationService
     private readonly HttpClient _httpClient;
     private User? _currentUser;
     private readonly List<string> _currentUserRoles = new();
+    private DateTime _tokenExpiresAt;
 
     public event EventHandler<bool>? AuthenticationStateChanged;
 
-    public bool IsAuthenticated => _currentUser != null;
+    // checks both that a user is logged in AND that their token has not expired yet
+    public bool IsAuthenticated => _currentUser != null && DateTime.UtcNow < _tokenExpiresAt;
     public User? CurrentUser => _currentUser;
     public List<string> CurrentUserRoles => _currentUserRoles;
 
@@ -58,6 +60,9 @@ public class ApiAuthenticationService : IAuthenticationService
             // Every request the app makes to the API after login will automatically include the token in the header.
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token!.Token);
+
+            // store when this token expires so IsAuthenticated can detect expiry automatically
+            _tokenExpiresAt = token.ExpiresAt;
 
 
 
@@ -135,6 +140,7 @@ public class ApiAuthenticationService : IAuthenticationService
     {
         _currentUser = null;
         _currentUserRoles.Clear();
+        _tokenExpiresAt = DateTime.MinValue; // clear expiry so IsAuthenticated returns false immediately
         _httpClient.DefaultRequestHeaders.Authorization = null;
         AuthenticationStateChanged?.Invoke(this, false);
         return Task.CompletedTask;

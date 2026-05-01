@@ -108,7 +108,7 @@
                    FontAttributes="Bold"/>
             <Label Text="{Binding LocationText}"
                    FontSize="13"
-                   TextColor="{AppThemeBinding Light=#555, Dark=#aaa}"/>
+                   TextColor="{Binding LocationTextColor}"/>
 
 
 
